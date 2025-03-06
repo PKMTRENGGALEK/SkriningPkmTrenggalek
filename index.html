@@ -39,7 +39,98 @@
       <a href="#reports" class="menu-link" onclick="showPage('reports', this)"><i class="fas fa-file-alt"></i> Reports</a>
     </div>
     <div class="content" id="content">
-      <div id="home" class="page active"> <h4>Welcome to the Dashboard</h4> </div>
+      <div id="home" class="page active"> <h4>Welcome to the Dashboard</h4> 
+          
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+<div class="container-fluid">
+    <div class="row">
+        
+
+        <!-- Main Content -->
+        <main class="col-md-10 p-4">
+            <h3>Dashboard</h3>
+
+            <!-- Cards -->
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="card text-white bg-primary p-3">
+                        <h5>Total Pasien</h5>
+                        <h2>1,235</h2>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-success p-3">
+                        <h5>Pasien Hari Ini</h5>
+                        <h2>120</h2>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-warning p-3">
+                        <h5>Kunjungan</h5>
+                        <h2>98</h2>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-danger p-3">
+                        <h5>Layanan</h5>
+                        <h2>15</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="card mt-4 p-3">
+                <h5>Tren Kunjungan</h5>
+                <canvas id="chartKunjungan"></canvas>
+            </div>
+
+            <!-- Table -->
+            <div class="card mt-4 p-3">
+                <h5>Data Pasien Terbaru</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Umur</th>
+                            <th>Diagnosa</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Budi Santoso</td>
+                            <td>45</td>
+                            <td>Demam</td>
+                            <td><button class="btn btn-primary btn-sm">Detail</button></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Siti Aminah</td>
+                            <td>32</td>
+                            <td>Batuk</td>
+                            <td><button class="btn btn-primary btn-sm">Detail</button></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Agus Wijaya</td>
+                            <td>50</td>
+                            <td>Hipertensi</td>
+                            <td><button class="btn btn-primary btn-sm">Detail</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+
+
+      </div>
       <div id="skriningDewasa" class="page"> 
         <!-- //halaman input -->
         <div class="card shadow">
