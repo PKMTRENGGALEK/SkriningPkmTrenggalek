@@ -343,3 +343,54 @@ const ctx = document.getElementById('chartKunjungan').getContext('2d');
             }]
         }
     });
+
+     // document.addEventListener("DOMContentLoaded", function () {
+     //        const API_URL = "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec"; // Ganti dengan URL Google Apps Script Web App
+            
+     //        fetch(API_URL)
+     //            .then(response => response.json())
+     //            .then(data => {
+     //                if (data.length === 0) return;
+                    
+     //                // Ambil header dari objek pertama
+     //                const headers = Object.keys(data[0]);
+     //                const thead = document.getElementById("table-head");
+     //                const tbody = document.getElementById("table-body");
+                    
+     //                // Buat baris header
+     //                let headerRow = "<tr>" + headers.map(h => `<th>${h.replace(/_/g, ' ')}</th>`).join('') + "</tr>";
+     //                thead.innerHTML = headerRow;
+                    
+     //                // Isi tabel dengan data
+     //                data.forEach(row => {
+     //                    let rowHTML = "<tr>" + headers.map(h => `<td>${row[h]}</td>`).join('') + "</tr>";
+     //                    tbody.innerHTML += rowHTML;
+     //                });
+     //            })
+     //            .catch(error => console.error("Error fetching data:", error));
+     //    });
+     $(document).ready(function () {
+        const apiUrl = "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec"; // Ganti dengan URL Google Apps Script
+        
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length === 0) return;
+                
+                // Generate Table Headers
+                let headers = Object.keys(data[0]);
+                let theadHTML = headers.map(header => `<th>${header.replace(/_/g, ' ')}</th>`).join('');
+                $("#tableHead").html(theadHTML);
+
+                // Generate Table Rows
+                let tbodyHTML = data.map(row => {
+                    let rowData = headers.map(key => `<td>${row[key]}</td>`).join('');
+                    return `<tr>${rowData}</tr>`;
+                }).join('');
+                $("#tableBody").html(tbodyHTML);
+
+                // Initialize DataTables
+                $('#dataTable').DataTable();
+            })
+            .catch(error => console.error("Error fetching data:", error));
+    });
