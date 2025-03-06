@@ -329,3 +329,17 @@ cholesterolInput.addEventListener("input", deteksiStroke);
 
 });
 
+const ctx = document.getElementById('chartKunjungan').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'],
+            datasets: [{
+                label: 'Jumlah Kunjungan',
+                data: [120, 135, 98, 110, 90, 80],
+                borderColor: '#007bff',
+                borderWidth: 2,
+                fill: false
+            }]
+        }
+    });
