@@ -396,68 +396,6 @@ $(document).ready(function () {
     .catch((error) => console.error("Error fetching data:", error));
 });
 
-// $("#Nama_pasien").autocomplete({
-//   minLength: 8,
-//   source: function (request, response) {
-//     $.ajax({
-//       url: "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec",
-//       type: "GET",
-//       dataType: "json",
-//       beforeSend: function () {
-//         // Saat request berjalan, tampilkan pesan pencarian
-//         $("#Nama_pasien").val("Mencari data...").css("color", "red");
-//       },
-//       success: function (data) {
-//         console.log("Data API diterima:", data);
-
-//         let namaList = data.map((item) => ({
-//           label: item.Nama_pasien,
-//           value: item.Nama_pasien,
-//           data: item, // Simpan seluruh data pasien
-//         }));
-
-//         console.log("Data untuk autocomplete:", namaList);
-//         response(namaList);
-//       },
-//       complete: function () {
-//         // Kembalikan input ke kosong setelah data dimuat
-//         $("#Nama_pasien").val("");
-//       },
-//     });
-//   },
-//   minLength: 1,
-//   select: function (event, ui) {
-//     console.log("Pasien Dipilih:", ui.item); // Debugging
-
-//     let pasien = ui.item.data;
-
-//     // Isi modal dengan data pasien
-//     $("#modalNama").text(pasien.Nama_pasien || "-");
-//     $("#modalTglLahir").text(pasien.Tgl_lahir || "-");
-//     $("#modalUsia").text(pasien.Usia || "-");
-//     $("#modalJK").text(
-//       pasien.Jenis_kelamin === "L" ? "Laki-laki" : "Perempuan"
-//     );
-//     $("#modalAlamat").text(pasien.Alamat || "-");
-//     $("#modalTB").text(pasien.Tinggi_badan || "-");
-//     $("#modalBB").text(pasien.Berat_badan || "-");
-//     $("#modalIMT").text(pasien.Imt || "-");
-//     $("#modalLingkarP").text(pasien.Lingkar_perut || "-");
-//     $("#modalObesitas").text(pasien.Hasil_obesitas || "-");
-//     $("#modalSistol").text(pasien.Sistol || "-");
-//     $("#modalDiastol").text(pasien.Diastol || "-");
-//     $("#modalHT").text(pasien.Hasil_HT || "-");
-//     $("#modalCholesterol").text(pasien.Cholesterol || "-");
-//     $("#modalStroke").text(pasien.Hasil_Stroke || "-");
-
-//     // **Coba panggil modal dengan delay**
-//     setTimeout(function () {
-//       $("#modalPasien").modal("show");
-//     }, 300);
-
-//     return false; // Supaya input tidak terisi otomatis
-//   },
-// });
 
 $("#Nama_pasien").autocomplete({
   minLength: 3,
@@ -465,7 +403,7 @@ $("#Nama_pasien").autocomplete({
     $("#loadingIcon").show(); // Tampilkan spinner sebelum request
 
     $.ajax({
-      url: "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec",
+      url: "https://script.google.com/macros/s/AKfycbwyy-oAsnZN_D6wfKOBOGDWXfhS-w51-BGi6sedh53y-z0kQoFRPgP6_OXfa6LFQ-mh/exec",
       type: "GET",
       dataType: "json",
       success: function (data) {
