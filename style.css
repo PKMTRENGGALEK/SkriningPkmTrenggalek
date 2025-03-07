@@ -118,3 +118,39 @@ input[readonly] {
         max-width: 100%;
     }
 }
+#dataTable {
+  font-size: 12px; /* Perkecil ukuran font */
+  width: auto; /* Buat tabel lebih kecil sesuai konten */
+}
+
+#dataTable th, 
+#dataTable td {
+  padding: 5px 8px; /* Kurangi padding agar lebih compact */
+  text-align: left; /* Rata kiri agar lebih rapi */
+}
+
+.dataTables_wrapper {
+  font-size: 12px; /* Perkecil font dari elemen DataTables */
+}
+.sidebar-footer {
+  position: absolute; /* Buat footer tetap di bawah */
+  bottom: 0;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  font-size: 14px;
+  /*background: rgba(255, 255, 255, 0.1); /* Efek transparan */*/
+  color: white;
+}
+.modal-body {
+  font-size: 14px; /* Sesuaikan ukuran font */
+}
+
+.modal-body th {
+  font-size: 14px; /* Ukuran font untuk header tabel */
+  font-weight: bold;
+}
+
+.modal-body td {
+  font-size: 13px; /* Ukuran font untuk isi tabel */
+}
