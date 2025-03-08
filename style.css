@@ -203,3 +203,66 @@ input[readonly] {
 .dataTable td:last-child {
   width: 100px; /* Atur ukuran kolom action */
 }
+/* Animasi Loading di Input NIK */
+@keyframes loading {
+    0% { border-color: #ccc; }
+    50% { border-color: #007bff; box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); }
+    100% { border-color: #ccc; }
+}
+
+.loading {
+    animation: loading 1s infinite;
+}
+
+/* Badge lebih elegan */
+#loadingIcon {
+    position: absolute;
+    right: 80px; /* Geser sedikit agar tidak menimpa teks input */
+    top: 23%;
+    transform: translateY(-50%);
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.loading {
+    background: url('https://i.gifer.com/ZZ5H.gif') no-repeat right center;
+    background-size: 20px;
+}
+
+#notifContainer {
+    display: none;
+    background-color: #ffcccc;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.badge {
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+/* Modal lebih stylish */
+.modal-header {
+    background: #007bff;
+    color: white;
+}
+
+.modal-content {
+    border-radius: 10px;
+}
+
+/* Animasi muncul */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.modal.show .modal-content {
+    animation: fadeIn 0.3s ease-in-out;
+}
