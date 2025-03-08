@@ -1,85 +1,65 @@
-
 const sidebar = document.getElementById("sidebar");
 const toggleSidebarBtn = document.getElementById("toggleSidebar");
 
-// Event untuk toggle sidebar
 toggleSidebarBtn.addEventListener("click", function () {
   sidebar.classList.toggle("active");
   toggleSidebarBtn.classList.toggle("active");
 });
 
-// Fungsi toggle submenu
 function toggleSubmenu(id) {
-  let selectedSubmenu = document.getElementById(id);
-  let parentMenu = selectedSubmenu.closest(".has-submenu");
-
-  // Periksa apakah submenu sudah terbuka
-  let isCurrentlyOpen = selectedSubmenu.classList.contains("show");
-
-  // Tutup semua submenu kecuali yang sedang diklik
-  document.querySelectorAll(".submenu").forEach((submenu) => {
-    if (submenu !== selectedSubmenu) {
-      submenu.classList.remove("show");
-    }
-  });
-
-  // Toggle submenu yang diklik
-  selectedSubmenu.classList.toggle("show", !isCurrentlyOpen);
-
-  // Tambah/remove class "active" pada menu utama
-  if (parentMenu) {
-    parentMenu.classList.toggle("active", !isCurrentlyOpen);
-  }
+  document.getElementById(id).classList.toggle("show");
 }
 
-// Fungsi untuk menampilkan halaman
 function showPage(pageId, element) {
-  // Sembunyikan semua halaman sebelum menampilkan yang baru
   document.querySelectorAll(".page").forEach((page) => {
     page.classList.remove("active");
   });
-
   setTimeout(() => {
     document.getElementById(pageId).classList.add("active");
+    if (pageId === "skriningDewasa") {
+      // Inisialisasi Select2 jika ada
+      $(".select2").select2({
+        theme: "bootstrap4",
+        placeholder: function () {
+          return $(this).data("placeholder");
+        },
+        allowClear: true,
+      });
+
+      // isi disini untuk fungsi baru
+
+      // Fokus ke input pencarian saat Select2 dibuka
+      $(".select2").on("select2:open", function () {
+        let searchField = document.querySelector(
+          ".select2-container--open .select2-search__field"
+        );
+        if (searchField) {
+          searchField.focus();
+        }
+      });
+      //flatpicker
+      $(function () {
+        flatpickr(".datepicker", {
+          dateFormat: "Y-m-d",
+          allowInput: true,
+          theme: "dark",
+        });
+      });
+
+      fetchPetugas();
+    }
   }, 100);
 
-  // Hapus 'active' dari semua menu sebelum menandai yang dipilih
   document.querySelectorAll(".menu-link").forEach((link) => {
     link.classList.remove("active");
   });
   element.classList.add("active");
 
-  // Periksa apakah elemen yang diklik ada di dalam submenu
-  let isInsideSubmenu = element.closest(".submenu") !== null;
-  let isParentMenu = element.closest(".has-submenu") !== null;
-
-  if (!isInsideSubmenu && !isParentMenu) {
-    // Jika yang diklik bukan dalam submenu, tutup semua submenu
-    document.querySelectorAll(".submenu").forEach((submenu) => {
-      submenu.classList.remove("show");
-    });
-  }
-
-  // Tutup sidebar otomatis jika layar kecil
   if (window.innerWidth <= 768) {
     sidebar.classList.remove("active");
     toggleSidebarBtn.classList.remove("active");
   }
 }
-
-// **Menutup submenu jika klik di luar sidebar**
-document.addEventListener("click", function (event) {
-  let isClickInsideSidebar = sidebar.contains(event.target);
-  let isSubmenuClick = event.target.closest(".submenu") !== null;
-  let isMenuClick = event.target.closest(".has-submenu") !== null;
-
-  if (!isClickInsideSidebar && !isSubmenuClick && !isMenuClick) {
-    document.querySelectorAll(".submenu").forEach((submenu) => {
-      submenu.classList.remove("show");
-    });
-  }
-});
-
 
 function fetchPetugas() {
   fetch(
@@ -385,10 +365,11 @@ new Chart(ctx, {
   },
 });
 
-
+//
 $(document).ready(function () {
-  const apiUrl = "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec";
-  
+  const apiUrl =
+    "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec";
+
   let dtInstance;
 
   function loadData() {
@@ -397,17 +378,17 @@ $(document).ready(function () {
       .then((data) => {
         if (data.length === 0) return;
 
-        const headers = Object.keys(data[0]).slice(0, 9); // Ambil 9 kolom pertama
-        headers.push("Action"); // Tambahkan kolom action
+        const headers = Object.keys(data[0]).slice(1, 9); // Ambil kolom kecuali ID
+        headers.push("Action"); // Tambahkan kolom Action
 
-        const newData = data.map((row, index) => {
-          let rowData = headers.slice(0, 9).map(key => row[key]); // Data utama
-          
-          // Tambahkan tombol view di kolom terakhir
+        const newData = data.map((row) => {
+          let rowData = headers.slice(0, 8).map((key) => row[key]); // Data utama tanpa ID
+
+          // Tambahkan tombol view di kolom terakhir dengan ID tersembunyi
           rowData.push(`
-            <button class="btn btn-primary btn-sm view-btn" data-index="${index}">View</button>
+            <button class="btn btn-primary btn-sm view-btn" data-id="${row.ID}">View</button>
           `);
-          
+
           return rowData;
         });
 
@@ -418,20 +399,26 @@ $(document).ready(function () {
         } else {
           dtInstance = $("#dataTable").DataTable({
             data: newData,
-            columns: headers.map(header => ({
-              title: header.replace(/_/g, " ")
+            columns: headers.map((header) => ({
+              title: header.replace(/_/g, " "),
             })),
+            columnDefs: [
+              { targets: 0, visible: false, searchable: false }, // Sembunyikan kolom ID
+            ],
             responsive: true,
             autoWidth: false,
-            paging: true
+            paging: true,
           });
         }
 
         // Event listener untuk tombol "View"
-        $("#dataTable tbody").off("click").on("click", ".view-btn", function () {
-          let index = $(this).data("index");
-          showDataModal(data[index]);
-        });
+        $("#dataTable tbody")
+          .off("click")
+          .on("click", ".view-btn", function () {
+            let id = $(this).data("id");
+            let selectedData = data.find((row) => row.ID == id);
+            showDataModal(selectedData);
+          });
       })
       .catch((error) => console.error("Error fetching data:", error));
   }
@@ -439,8 +426,8 @@ $(document).ready(function () {
   function showDataModal(data) {
     let modalBody = $("#modalDataBody");
     modalBody.empty();
-    
-    Object.keys(data).forEach(key => {
+
+    Object.keys(data).forEach((key) => {
       modalBody.append(`
         <tr>
           <th>${key.replace(/_/g, " ")}</th>
@@ -456,7 +443,6 @@ $(document).ready(function () {
   setInterval(loadData, 5000);
 });
 
-////////
 $("#Nama_pasien").autocomplete({
   minLength: 3,
   source: function (request, response) {
