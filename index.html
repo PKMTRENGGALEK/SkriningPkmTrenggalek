@@ -176,18 +176,33 @@
                     </div>
                    
                     <!-- Nama Pasien -->
-                    <div class="col-12 d-flex align-items-center">
+                 <div class="col-12 d-flex align-items-center">
                       <label for="Nama_pasien" class="form-label col-md-3 text-end">Nama Pasien</label>
-                      <div class="col-md-6">
-                        <!-- <input type="text" name="Nama_pasien" id="Nama_pasien" class="form-control"> -->
-                        <div class="position-relative">
-                          <input type="text" id="Nama_pasien" class="form-control" name="Nama_pasien" placeholder="Cari Nama Pasien..." />
-                          <i id="loadingIcon" class="fa fa-spinner fa-spin position-absolute" 
-                             style="right: 10px; top: 30%; transform: translateY(-50%); display: none; color: rgb(54, 126, 39);"></i>
-                        </div>
+                      <div class="col-md-6 d-flex align-items-center position-relative">
+                          <input type="text" id="Nama_pasien" class="form-control me-2" name="Nama_pasien" placeholder="Cari Nama Pasien...">
+                          <button id="btnCheckDuplicate" class="btn btn-warning shadow btn-sm me-2">Check</button>
+                          <i id="loadingIcon" class="fa fa-spinner fa-spin"
+                             style="color: rgb(54, 126, 39); font-size: 1.5rem; display: none;"></i>
                       </div>
+                  </div>
+                   <div class="col-12 d-flex align-items-center">
+                        <label for="NIK" class="form-label col-md-3 text-end">NIK Pasien</label>
+                        <div class="col-md-6 d-flex align-items-center">
+                            <!-- Input NIK dengan Animasi -->
+                            <input type="text" id="NIK" class="form-control" placeholder="Masukkan NIK">
+                            <span id="loadingIcon" style="display:none; margin-left: 5px;">🔄</span>
+
+                            <!-- Badge Duplikat -->
+                            <span id="badgeMatch" class="badge bg-danger ms-2" style="display:none;">Duplikat!</span>
+                        </div>
                     </div>
 
+                    <!-- Notifikasi -->
+                    <div class="col-12 d-flex align-items-center mt-2">
+                        <div id="notifContainer" class="alert alert-danger" style="display: none; margin-left: 25%;">
+                            <span id="notif">🔴 Duplikat ditemukan! Klik badge untuk melihat detail.</span>
+                        </div>
+                    </div>
                     <!-- Tanggal Lahir Pasien -->
                     <div class="col-12 d-flex align-items-center">
                       <label for="Tgl_lahir" class="form-label col-md-3 text-end">Tanggal Lahir Pasien</label>
@@ -329,7 +344,7 @@
             <tr><th>Alamat</th><td id="modalAlamat"></td></tr>
             <tr><th>Tinggi Badan</th><td id="modalTB"></td></tr>
             <tr><th>Berat Badan</th><td id="modalBB"></td></tr>
-            <tr><th>IMT</th><td id="modalIMT"></td></tr>
+            <!-- <tr><th>IMT</th><td id="modalIMT"></td></tr>
             <tr><th>Hasil IMT</th><td id="modalHasilImt"></td></tr>
             <tr><th>Lingkar Perut</th><td id="modalLingkarP"></td></tr>
             <tr><th>Hasil Obesitas</th><td id="modalObesitas"></td></tr>
@@ -337,7 +352,8 @@
             <tr><th>Tensi Diastol</th><td id="modalDiastol"></td></tr>
             <tr><th>Hasil Hipertensi</th><td id="modalHT"></td></tr>
             <tr><th>Kolesterol</th><td id="modalCholesterol"></td></tr>
-            <tr><th>Hasil Deteksi Stroke</th><td id="modalStroke"></td></tr>
+            <tr><th>Hasil Deteksi Stroke</th><td id="modalStroke"></td></tr> -->
+
           </tbody>
         </table>
         <div class="modal-footer">
@@ -366,3 +382,45 @@
     </div>
   </div>
 </div>
+
+<!-- Modal untuk menampilkan DataTable -->
+
+<div class="modal fade" id="modalDuplikat" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Detail Pasien Duplikat</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table id="tablePasien" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Tempat Pelayanan</th>
+                            <th>Nama Petugas</th>
+                            <th>Tgl Pelayanan</th>
+                            <th>Nama Pasien</th>
+                            <th>NIK</th>
+                            <th>Tgl Lahir</th>
+                            <th>Usia</th>
+                            <th>Jenis Kelamin</th>
+                            <th>Alamat</th>
+                            <th>RT</th>
+                            <th>Tinggi Badan</th>
+                            <th>Berat Badan</th>
+                            <th>Hasil IMT</th>
+                            <th>IMT</th>
+                            <th>Lingkar Perut</th>
+                            <th>Hasil Obesitas</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
