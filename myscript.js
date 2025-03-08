@@ -113,54 +113,11 @@ document.getElementById("btnFetch").addEventListener("click", function (e) {
     return;
   }
 
-  // Kirim data ke Google Sheets menggunakan Fetch API
-//   fetch(
-//     "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec",
-//     {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify(formObject),
-//       mode: "no-cors",
-//     }
-//   )
-//     .then(() => {
-//       Swal.fire({
-//         icon: "success",
-//         title: "Berhasil!",
-//         text: "Data telah dikirim!",
-//         timer: 2000,
-//         showConfirmButton: false,
-//       });
-
-//       // Reset form setelah sukses
-//       document.querySelector("form").reset();
-
-//       // Reset Select2
-//       $("#tempatPelayanan").val(null).trigger("change");
-//       $("#namaPetugas").val(null).trigger("change");
-//       $("#Jenis_kelamin").val(null).trigger("change");
-
-//       submitBtn.innerHTML = `<i class="fas fa-feather"></i> Submit`;
-//       submitBtn.disabled = false;
-//     })
-//     .catch((error) => {
-//       console.error("Error:", error);
-
-//       Swal.fire({
-//         icon: "error",
-//         title: "Oops!",
-//         text: "Terjadi kesalahan, coba lagi!",
-//       });
-
-//       submitBtn.innerHTML = `<i class="fas fa-feather"></i> Submit`;
-//       submitBtn.disabled = false;
-//     });
-// });
+// Kirim data ke Google Sheets menggunakan Fetch API
 // Buat objek khusus untuk API kedua (hanya field tertentu)
 let formObjectAPI2 = {
   Nama_pasien: formObject.Nama_pasien,
+  NIK:formObject.NIK,
   Tgl_lahir: formObject.Tgl_lahir,
   Usia: formObject.Usia,
   Jenis_kelamin: formObject.Jenis_kelamin,
@@ -420,83 +377,7 @@ new Chart(ctx, {
   },
 });
 
-//
-// $(document).ready(function () {
-//   const apiUrl =
-//     "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec";
 
-//   let dtInstance;
-
-//   function loadData() {
-//     fetch(apiUrl)
-//       .then((response) => response.json())
-//       .then((data) => {
-//         if (data.length === 0) return;
-
-//         const headers = Object.keys(data[0]).slice(1, 9); // Ambil kolom kecuali ID
-//         headers.push("Action"); // Tambahkan kolom Action
-
-//         const newData = data.map((row) => {
-//           let rowData = headers.slice(0, 8).map((key) => row[key]); // Data utama tanpa ID
-
-//           // Tambahkan tombol view di kolom terakhir dengan ID tersembunyi
-//           rowData.push(`
-//             <button class="btn btn-primary btn-sm view-btn" data-id="${row.ID}">View</button>
-//           `);
-
-//           return rowData;
-//         });
-
-//         if (dtInstance) {
-//           dtInstance.clear();
-//           dtInstance.rows.add(newData);
-//           dtInstance.draw(false);
-//         } else {
-//           dtInstance = $("#dataTable").DataTable({
-//             data: newData,
-//             columns: headers.map((header) => ({
-//               title: header.replace(/_/g, " "),
-//             })),
-//             columnDefs: [
-//               { targets: 0, visible: false, searchable: false }, // Sembunyikan kolom ID
-//             ],
-//             responsive: true,
-//             autoWidth: false,
-//             paging: true,
-//           });
-//         }
-
-//         // Event listener untuk tombol "View"
-//         $("#dataTable tbody")
-//           .off("click")
-//           .on("click", ".view-btn", function () {
-//             let id = $(this).data("id");
-//             let selectedData = data.find((row) => row.ID == id);
-//             showDataModal(selectedData);
-//           });
-//       })
-//       .catch((error) => console.error("Error fetching data:", error));
-//   }
-
-//   function showDataModal(data) {
-//     let modalBody = $("#modalDataBody");
-//     modalBody.empty();
-
-//     Object.keys(data).forEach((key) => {
-//       modalBody.append(`
-//         <tr>
-//           <th>${key.replace(/_/g, " ")}</th>
-//           <td>${data[key]}</td>
-//         </tr>
-//       `);
-//     });
-
-//     $("#dataModal").modal("show");
-//   }
-
-//   loadData();
-//   setInterval(loadData, 5000);
-// });
 // tampil report
 $(document).ready(function () {
   const apiUrl =
@@ -686,15 +567,15 @@ $("#Nama_pasien").autocomplete({
       $("#modalAlamat").text(pasien.Alamat || "-");
       $("#modalTB").text(pasien.Tinggi_badan || "-");
       $("#modalBB").text(pasien.Berat_badan || "-");
-      $("#modalIMT").text(pasien.Imt || "-");
-      $("#modalHasilImt").text(pasien.Hasil_imt || "-");
-      $("#modalLingkarP").text(pasien.Lingkar_perut || "-");
-      $("#modalObesitas").text(pasien.Hasil_obesitas || "-");
-      $("#modalSistol").text(pasien.Sistol || "-");
-      $("#modalDiastol").text(pasien.Diastol || "-");
-      $("#modalHT").text(pasien.Hasil_HT || "-");
-      $("#modalCholesterol").text(pasien.Cholesterol || "-");
-      $("#modalStroke").text(pasien.Hasil_Stroke || "-");
+      // $("#modalIMT").text(pasien.Imt || "-");
+      // $("#modalHasilImt").text(pasien.Hasil_imt || "-");
+      // $("#modalLingkarP").text(pasien.Lingkar_perut || "-");
+      // $("#modalObesitas").text(pasien.Hasil_obesitas || "-");
+      // $("#modalSistol").text(pasien.Sistol || "-");
+      // $("#modalDiastol").text(pasien.Diastol || "-");
+      // $("#modalHT").text(pasien.Hasil_HT || "-");
+      // $("#modalCholesterol").text(pasien.Cholesterol || "-");
+      // $("#modalStroke").text(pasien.Hasil_Stroke || "-");
 
       // Simpan data pasien sementara di modal
       $("#modalPasien").data("selectedPasien", pasien);
@@ -758,3 +639,103 @@ $(document).on("click", "#btnPilihData", function () {
 $("#modalPasien").on("hidden.bs.modal", function () {
   $("#Nama_pasien").focus();
 });
+
+// check duplikat
+$(document).ready(function () {
+    $("#btnCheckDuplicate").on("click", function (event) {
+        event.preventDefault(); // Mencegah reload halaman
+
+        let nama = $("#Nama_pasien").val().trim();
+        let nik = $("#NIK").val().trim();
+
+        if (nama === "" || nik === "") {
+            $("#notifContainer, #badgeMatch").fadeOut();
+            return;
+        }
+
+        console.log("Memeriksa duplikasi untuk:", nama, nik);
+
+        // Tambahkan animasi loading
+        $("#loadingIcon").show();
+
+        $.ajax({
+            url: "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec",
+            type: "GET",
+            dataType: "json",
+            success: function (response) {
+                $("#loadingIcon").hide();
+                console.log("Respons API:", response);
+
+                let matchingData = response.filter(item => 
+                    item.Nama_pasien.toLowerCase() === nama.toLowerCase() &&
+                    item.NIK.toString() === nik.toString()
+                );
+
+                if (matchingData.length > 0) {
+                    $("#badgeMatch, #notifContainer").fadeIn();
+                    $("#badgeMatch").off("click").on("click", function () {
+                        showModalWithTable(matchingData);
+                    });
+                } else {
+                    $("#badgeMatch, #notifContainer").fadeOut();
+                }
+            },
+            error: function (xhr, status, error) {
+                $("#loadingIcon").hide();
+                console.error("Terjadi kesalahan dalam pengecekan data:", error);
+                alert("Gagal mengambil data. Silakan coba lagi.");
+            }
+        });
+    });
+
+    function showModalWithTable(data) {
+        let tableBody = $("#tablePasien tbody");
+        tableBody.empty();
+
+        data.forEach((item) => {
+            tableBody.append(`
+                <tr>
+                    <td>${item.Tempat_pelayanan}</td>
+                    <td>${item.Nama_petugas}</td>
+                    <td>${new Date(item.Tgl_pelayanan).toLocaleDateString()}</td>
+                    <td>${item.Nama_pasien}</td>
+                    <td>${item.NIK}</td>
+                    <td>${new Date(item.Tgl_lahir).toLocaleDateString()}</td>
+                    <td>${item.Usia}</td>
+                    <td>${item.Jenis_kelamin}</td>
+                    <td>${item.Alamat}</td>
+                    <td>${item.RT}</td>
+                    <td>${item.Tinggi_badan}</td>
+                    <td>${item.Berat_badan}</td>
+                    <td>${item.Hasil_imt}</td>
+                    <td>${item.Imt}</td>
+                    <td>${item.Lingkar_perut}</td>
+                    <td>${item.Hasil_obesitas}</td>
+                </tr>
+            `);
+        });
+
+        if (!$.fn.DataTable.isDataTable("#tablePasien")) {
+            $("#tablePasien").DataTable({
+                responsive: true,
+                destroy: true
+            });
+        } else {
+            $("#tablePasien").DataTable().clear().rows.add(data).draw();
+        }
+
+        $("#modalDuplikat").modal("show");
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
