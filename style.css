@@ -1,91 +1,92 @@
- body {
-        background-color: #f4f7fc;
-      }
-      .sidebar {
-        width: 250px;
-        height: 100vh;
-        position: fixed;
-        background: #2c3e50;
-        padding: 15px;
-        transition: transform 0.3s ease-in-out;
-        z-index: 1000;
-        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
-      }
-      .sidebar a {
-        text-decoration: none;
-        color: #ecf0f1;
-        display: block;
-        padding: 10px;
-        margin-bottom: 5px;
-        border-radius: 5px;
-      }
-      .sidebar a:hover, .sidebar a.active {
-        background: #1abc9c;
-      }
-      .submenu {
-        display: none;
-        padding-left: 20px;
-      }
-      .submenu.show {
-        display: block;
-      }
-      .content {
-        margin-left: 270px;
-        padding: 20px;
-      }
-      .page {
-        display: none;
-        opacity: 0;
-        transition: opacity 0.5s ease-in-out;
-      }
-      .page.active {
-        display: block;
-        animation: fadeIn 0.5s ease-in-out;
-        opacity: 1;
-      }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-      #toggleSidebar {
-        display: none;
-        position: fixed;
-        top: 15px;
-        right: 15px;
-        z-index: 1100;
-        background-color: #1abc9c;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
-      }
-      #toggleSidebar.active {
-        transform: rotate(90deg);
-        background-color: #16a085;
-      }
-      @media (max-width: 768px) {
-        .sidebar {
-          transform: translateX(-100%);
-        }
-        .sidebar.active {
-          transform: translateX(0);
-        }
-        #toggleSidebar {
-          display: block;
-        }
-        .content {
-          margin-left: 0;
-        }
-      }
-      .form-control[readonly] {
-    background-color: #f8f9fa !important; /* Warna lebih terang */
-    color: #6c757d !important;
-    opacity: 0.7;
+body {
+  background-color: #f4f7fc;
+}
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  background: #2c3e50;
+  padding: 15px;
+  transition: transform 0.3s ease-in-out;
+  z-index: 1000;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+}
+.sidebar a {
+  text-decoration: none;
+  color: #ecf0f1;
+  display: block;
+  padding: 10px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+}
+.sidebar a:hover,
+.sidebar a.active {
+  background: #1abc9c;
+}
+.submenu {
+  display: none;
+  padding-left: 20px;
+}
+.submenu.show {
+  display: block;
+}
+.content {
+  margin-left: 270px;
+  padding: 20px;
+}
+.page {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+.page.active {
+  display: block;
+  animation: fadeIn 0.5s ease-in-out;
+  opacity: 1;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+#toggleSidebar {
+  display: none;
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 1100;
+  background-color: #1abc9c;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+#toggleSidebar.active {
+  transform: rotate(90deg);
+  background-color: #16a085;
+}
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.active {
+    transform: translateX(0);
+  }
+  #toggleSidebar {
+    display: block;
+  }
+  .content {
+    margin-left: 0;
+  }
+}
+.form-control[readonly] {
+  background-color: #f8f9fa !important; /* Warna lebih terang */
+  color: #6c757d !important;
+  opacity: 0.7;
 }
 
 .select2-container {
@@ -98,32 +99,32 @@
   }
 }
 input[readonly] {
-    color: red !important; /* Warna merah */
-    font-weight: bold; /* Opsional: Membuat teks lebih tebal */
-    border: 1px solid red; /* Opsional: Memberi batas merah */
-    background-color: #ffe6e6; /* Opsional: Memberi latar belakang merah muda */
+  color: red !important; /* Warna merah */
+  font-weight: bold; /* Opsional: Membuat teks lebih tebal */
+  border: 1px solid red; /* Opsional: Memberi batas merah */
+  background-color: #ffe6e6; /* Opsional: Memberi latar belakang merah muda */
 }
 .form-label {
-    text-align: left !important; /* Membuat teks label rata kiri */
-    display: block; /* Membuat label tampil dalam satu baris penuh */
+  text-align: left !important; /* Membuat teks label rata kiri */
+  display: block; /* Membuat label tampil dalam satu baris penuh */
 }
 @media (max-width: 768px) {
-    .col-md-3 {
-        flex: 100%;
-        max-width: 100%;
-        text-align: left;
-    }
-    .col-md-6 {
-        flex: 100%;
-        max-width: 100%;
-    }
+  .col-md-3 {
+    flex: 100%;
+    max-width: 100%;
+    text-align: left;
+  }
+  .col-md-6 {
+    flex: 100%;
+    max-width: 100%;
+  }
 }
 #dataTable {
   font-size: 12px; /* Perkecil ukuran font */
   width: auto; /* Buat tabel lebih kecil sesuai konten */
 }
 
-#dataTable th, 
+#dataTable th,
 #dataTable td {
   padding: 5px 8px; /* Kurangi padding agar lebih compact */
   text-align: left; /* Rata kiri agar lebih rapi */
@@ -139,7 +140,7 @@ input[readonly] {
   padding: 10px;
   text-align: center;
   font-size: 14px;
-  /*background: rgba(255, 255, 255, 0.1); /* Efek transparan */*/
+
   color: white;
 }
 .modal-body {
@@ -153,4 +154,52 @@ input[readonly] {
 
 .modal-body td {
   font-size: 13px; /* Ukuran font untuk isi tabel */
+}
+.dataTables_filter {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px; /* Beri jarak dari tabel */
+}
+
+.dataTables_filter label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dataTables_filter input {
+  padding: 8px; /* Tambahkan padding */
+  border-radius: 5px; /* Tambahkan sudut membulat */
+  border: 1px solid #ccc;
+  outline: none;
+  width: 200px; /* Sesuaikan lebar input */
+}
+/* Membuat tabel lebih lebar dan responsif */
+.dataTable {
+  width: 100% !important; /* Pastikan tabel mengambil seluruh lebar */
+  table-layout: auto; /* Pastikan kolom bisa menyesuaikan isi */
+  border-collapse: collapse;
+}
+
+/* Header tabel agar lebih jelas */
+.dataTables_wrapper .dataTables_scrollHeadInner {
+  width: 100% !important;
+}
+
+.dataTables_wrapper {
+  overflow-x: auto; /* Tambahkan scroll jika tabel terlalu besar */
+}
+
+/* Atur ukuran kolom agar lebih proporsional */
+.dataTable th,
+.dataTable td {
+  padding: 12px; /* Berikan padding agar teks tidak terlalu rapat */
+  text-align: center; /* Pusatkan teks */
+  white-space: nowrap; /* Mencegah teks turun ke bawah */
+}
+
+/* Jika ingin kolom action lebih kecil */
+.dataTable th:last-child,
+.dataTable td:last-child {
+  width: 100px; /* Atur ukuran kolom action */
 }
