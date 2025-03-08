@@ -114,46 +114,101 @@ document.getElementById("btnFetch").addEventListener("click", function (e) {
   }
 
   // Kirim data ke Google Sheets menggunakan Fetch API
-  fetch(
-    "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formObject),
-      mode: "no-cors",
-    }
-  )
+//   fetch(
+//     "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec",
+//     {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify(formObject),
+//       mode: "no-cors",
+//     }
+//   )
+//     .then(() => {
+//       Swal.fire({
+//         icon: "success",
+//         title: "Berhasil!",
+//         text: "Data telah dikirim!",
+//         timer: 2000,
+//         showConfirmButton: false,
+//       });
+
+//       // Reset form setelah sukses
+//       document.querySelector("form").reset();
+
+//       // Reset Select2
+//       $("#tempatPelayanan").val(null).trigger("change");
+//       $("#namaPetugas").val(null).trigger("change");
+//       $("#Jenis_kelamin").val(null).trigger("change");
+
+//       submitBtn.innerHTML = `<i class="fas fa-feather"></i> Submit`;
+//       submitBtn.disabled = false;
+//     })
+//     .catch((error) => {
+//       console.error("Error:", error);
+
+//       Swal.fire({
+//         icon: "error",
+//         title: "Oops!",
+//         text: "Terjadi kesalahan, coba lagi!",
+//       });
+
+//       submitBtn.innerHTML = `<i class="fas fa-feather"></i> Submit`;
+//       submitBtn.disabled = false;
+//     });
+// });
+// Buat objek khusus untuk API kedua (hanya field tertentu)
+let formObjectAPI2 = {
+  Nama_pasien: formObject.Nama_pasien,
+  Tgl_lahir: formObject.Tgl_lahir,
+  Usia: formObject.Usia,
+  Jenis_kelamin: formObject.Jenis_kelamin,
+  Alamat: formObject.Alamat,
+  RT: formObject.RT,
+};
+ Promise.all([
+    fetch(
+      "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formObject),
+        mode: "no-cors",
+      }
+    ),
+    fetch(
+      "https://script.google.com/macros/s/AKfycbwyy-oAsnZN_D6wfKOBOGDWXfhS-w51-BGi6sedh53y-z0kQoFRPgP6_OXfa6LFQ-mh/exec",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formObjectAPI2),
+        mode: "no-cors",
+      }
+    ),
+  ])
     .then(() => {
       Swal.fire({
         icon: "success",
         title: "Berhasil!",
-        text: "Data telah dikirim!",
+        text: "Data telah dikirim ke dua API!",
         timer: 2000,
         showConfirmButton: false,
       });
-
-      // Reset form setelah sukses
       document.querySelector("form").reset();
-
-      // Reset Select2
       $("#tempatPelayanan").val(null).trigger("change");
       $("#namaPetugas").val(null).trigger("change");
       $("#Jenis_kelamin").val(null).trigger("change");
-
       submitBtn.innerHTML = `<i class="fas fa-feather"></i> Submit`;
       submitBtn.disabled = false;
     })
     .catch((error) => {
       console.error("Error:", error);
-
       Swal.fire({
         icon: "error",
         title: "Oops!",
         text: "Terjadi kesalahan, coba lagi!",
       });
-
       submitBtn.innerHTML = `<i class="fas fa-feather"></i> Submit`;
       submitBtn.disabled = false;
     });
@@ -366,6 +421,83 @@ new Chart(ctx, {
 });
 
 //
+// $(document).ready(function () {
+//   const apiUrl =
+//     "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec";
+
+//   let dtInstance;
+
+//   function loadData() {
+//     fetch(apiUrl)
+//       .then((response) => response.json())
+//       .then((data) => {
+//         if (data.length === 0) return;
+
+//         const headers = Object.keys(data[0]).slice(1, 9); // Ambil kolom kecuali ID
+//         headers.push("Action"); // Tambahkan kolom Action
+
+//         const newData = data.map((row) => {
+//           let rowData = headers.slice(0, 8).map((key) => row[key]); // Data utama tanpa ID
+
+//           // Tambahkan tombol view di kolom terakhir dengan ID tersembunyi
+//           rowData.push(`
+//             <button class="btn btn-primary btn-sm view-btn" data-id="${row.ID}">View</button>
+//           `);
+
+//           return rowData;
+//         });
+
+//         if (dtInstance) {
+//           dtInstance.clear();
+//           dtInstance.rows.add(newData);
+//           dtInstance.draw(false);
+//         } else {
+//           dtInstance = $("#dataTable").DataTable({
+//             data: newData,
+//             columns: headers.map((header) => ({
+//               title: header.replace(/_/g, " "),
+//             })),
+//             columnDefs: [
+//               { targets: 0, visible: false, searchable: false }, // Sembunyikan kolom ID
+//             ],
+//             responsive: true,
+//             autoWidth: false,
+//             paging: true,
+//           });
+//         }
+
+//         // Event listener untuk tombol "View"
+//         $("#dataTable tbody")
+//           .off("click")
+//           .on("click", ".view-btn", function () {
+//             let id = $(this).data("id");
+//             let selectedData = data.find((row) => row.ID == id);
+//             showDataModal(selectedData);
+//           });
+//       })
+//       .catch((error) => console.error("Error fetching data:", error));
+//   }
+
+//   function showDataModal(data) {
+//     let modalBody = $("#modalDataBody");
+//     modalBody.empty();
+
+//     Object.keys(data).forEach((key) => {
+//       modalBody.append(`
+//         <tr>
+//           <th>${key.replace(/_/g, " ")}</th>
+//           <td>${data[key]}</td>
+//         </tr>
+//       `);
+//     });
+
+//     $("#dataModal").modal("show");
+//   }
+
+//   loadData();
+//   setInterval(loadData, 5000);
+// });
+// tampil report
 $(document).ready(function () {
   const apiUrl =
     "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec";
@@ -384,9 +516,10 @@ $(document).ready(function () {
         const newData = data.map((row) => {
           let rowData = headers.slice(0, 8).map((key) => row[key]); // Data utama tanpa ID
 
-          // Tambahkan tombol view di kolom terakhir dengan ID tersembunyi
+          // Tambahkan tombol View dan Delete dengan ID tersembunyi
           rowData.push(`
             <button class="btn btn-primary btn-sm view-btn" data-id="${row.ID}">View</button>
+            <button class="btn btn-danger btn-sm delete-btn" data-id="${row.ID}">Delete</button>
           `);
 
           return rowData;
@@ -402,9 +535,7 @@ $(document).ready(function () {
             columns: headers.map((header) => ({
               title: header.replace(/_/g, " "),
             })),
-            columnDefs: [
-              { targets: 0, visible: false, searchable: false }, // Sembunyikan kolom ID
-            ],
+            columnDefs: [{ targets: 0, visible: false, searchable: false }], // Sembunyikan kolom ID
             responsive: true,
             autoWidth: false,
             paging: true,
@@ -419,6 +550,26 @@ $(document).ready(function () {
             let selectedData = data.find((row) => row.ID == id);
             showDataModal(selectedData);
           });
+
+        // Event listener untuk tombol "Delete"
+        $("#dataTable tbody").on("click", ".delete-btn", function () {
+          let id = $(this).data("id");
+
+          Swal.fire({
+            title: "Apakah Anda yakin?",
+            text: "Data akan dihapus secara permanen!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, hapus!",
+            cancelButtonText: "Batal",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              deleteData(id);
+            }
+          });
+        });
       })
       .catch((error) => console.error("Error fetching data:", error));
   }
@@ -439,10 +590,47 @@ $(document).ready(function () {
     $("#dataModal").modal("show");
   }
 
+  function deleteData(id) {
+    const deleteUrl = `https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec?action=delete&ID=${id}`;
+
+    // Tampilkan loading spinner
+    Swal.fire({
+      title: "Menghapus data...",
+      text: "Mohon tunggu sebentar",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    fetch(deleteUrl, { method: "GET" }) // Gunakan GET untuk menghindari CORS
+      .then((response) => response.json())
+      .then((result) => {
+        Swal.fire({
+          title: "Berhasil!",
+          text: result.message,
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
+        loadData(); // Refresh tabel setelah menghapus
+      })
+      .catch((error) => {
+        Swal.fire({
+          title: "Error!",
+          text: "Gagal menghapus data.",
+          icon: "error",
+        });
+        console.error("Error deleting data:", error);
+      });
+  }
+
   loadData();
-  setInterval(loadData, 5000);
+  setInterval(loadData, 3000);
 });
 
+// ambil nama pasiem autocomplete
 $("#Nama_pasien").autocomplete({
   minLength: 3,
   source: function (request, response) {
