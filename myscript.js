@@ -360,22 +360,91 @@ document.addEventListener("DOMContentLoaded", function () {
   cholesterolInput.addEventListener("input", deteksiStroke);
 });
 
-const ctx = document.getElementById("chartKunjungan").getContext("2d");
-new Chart(ctx, {
-  type: "line",
-  data: {
-    labels: ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"],
-    datasets: [
-      {
-        label: "Jumlah Kunjungan",
-        data: [120, 135, 98, 110, 90, 80],
-        borderColor: "#007bff",
-        borderWidth: 2,
-        fill: false,
-      },
-    ],
-  },
+// Chart
+document.addEventListener("DOMContentLoaded", async function () {
+    try {
+        const apiUrl = "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec";
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        if (data.length) {
+            // ========== 📌 CHART USIA ==========
+            let usiaCounts = {};
+            data.forEach(row => {
+                if (row.Usia !== undefined && row.Usia !== null) {
+                    let usia = String(row.Usia).trim();
+                    if (!isNaN(usia) && usia !== "") {
+                        usiaCounts[usia] = (usiaCounts[usia] || 0) + 1;
+                    }
+                }
+            });
+
+            let usiaLabels = Object.keys(usiaCounts).map(Number).sort((a, b) => a - b);
+            let usiaData = usiaLabels.map(usia => usiaCounts[usia]);
+
+            if (window.chartUsia) window.chartUsia.destroy();
+            const ctxUsia = document.getElementById("chartKunjungan").getContext("2d");
+            window.chartUsia = new Chart(ctxUsia, {
+                type: "line",
+                data: {
+                    labels: usiaLabels,
+                    datasets: [{
+                        label: "Jumlah Pasien per Usia",
+                        data: usiaData,
+                        borderColor: "#007bff",
+                        borderWidth: 2,
+                        fill: false,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Fix ukuran
+                    scales: {
+                        x: { title: { display: true, text: "Usia" } },
+                        y: { title: { display: true, text: "Jumlah Pasien" }, beginAtZero: true }
+                    }
+                }
+            });
+
+            // ========== 📌 CHART JENIS KELAMIN ==========
+            let countLaki = 0, countPerempuan = 0;
+            data.forEach(row => {
+                if (row.Jenis_kelamin) {
+                    let gender = row.Jenis_kelamin.trim().toUpperCase();
+                    if (gender === "L") countLaki++;
+                    else if (gender === "P") countPerempuan++;
+                }
+            });
+
+            if (window.chartJenisKelamin) window.chartJenisKelamin.destroy();
+            const ctxGender = document.getElementById("chartJeniskelamin").getContext("2d");
+            window.chartJenisKelamin = new Chart(ctxGender, {
+                type: "bar",
+                data: {
+                    labels: ["Laki-laki", "Perempuan"],
+                    datasets: [{
+                        label: "Jumlah Pasien",
+                        data: [countLaki, countPerempuan],
+                        backgroundColor: ["#007bff", "#ff6384"],
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Fix ukuran
+                    scales: {
+                        y: { beginAtZero: true }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
 });
+
 
 
 // tampil report
@@ -394,13 +463,21 @@ $(document).ready(function () {
         const headers = Object.keys(data[0]).slice(1, 9); // Ambil kolom kecuali ID
         headers.push("Action"); // Tambahkan kolom Action
 
-        const newData = data.map((row) => {
-          let rowData = headers.slice(0, 8).map((key) => row[key]); // Data utama tanpa ID
-
+        // const newData = data.map((row) => {
+        //   let rowData = headers.slice(0, 8).map((key) => row[key]); // Data utama tanpa ID
+          const newData = data.map((row) => {
+          let rowData = headers.slice(0, 8).map((key) => {
+          if ((key === "Tgl_pelayanan" || key === "Tgl_lahir") && row[key]) {
+            let date = new Date(row[key]);
+            return date.toISOString().split("T")[0];
+             // Format yyyy-mm-dd
+        }
+        return row[key];
+    });
           // Tambahkan tombol View dan Delete dengan ID tersembunyi
           rowData.push(`
-            <button class="btn btn-primary btn-sm view-btn" data-id="${row.ID}">View</button>
-            <button class="btn btn-danger btn-sm delete-btn" data-id="${row.ID}">Delete</button>
+            <button class="btn btn-primary btn-sm view-btn shadow" data-id="${row.ID}">View</button>
+            <button class="btn btn-danger btn-sm delete-btn shadow" data-id="${row.ID}">Delete</button>
           `);
 
           return rowData;
@@ -512,10 +589,15 @@ $(document).ready(function () {
 });
 
 // ambil nama pasiem autocomplete
-$("#Nama_pasien").autocomplete({
-  minLength: 3,
-  source: function (request, response) {
-    $("#loadingIcon").show(); // Tampilkan spinner sebelum request
+$(document).ready(function () {
+  $("#Nama_pasien").on("input", function () {
+    let keyword = $(this).val().trim().toLowerCase();
+    if (keyword.length < 3) {
+      $("#listPasien").empty();
+      return;
+    }
+
+    $("#loadingIcon").show();
 
     $.ajax({
       url: "https://script.google.com/macros/s/AKfycbwyy-oAsnZN_D6wfKOBOGDWXfhS-w51-BGi6sedh53y-z0kQoFRPgP6_OXfa6LFQ-mh/exec",
@@ -523,122 +605,75 @@ $("#Nama_pasien").autocomplete({
       dataType: "json",
       success: function (data) {
         console.log("Data API diterima:", data);
+        let filteredData = data.filter((item) =>
+          item.Nama_pasien.toLowerCase().includes(keyword)
+        );
 
-        let keyword = request.term.toLowerCase();
-        let filteredData = data.filter((item) => {
-          let nama = item.Nama_pasien.toLowerCase();
-          return nama.includes(keyword) || nama.startsWith(keyword);
-        });
-
-        if (filteredData.length === 0) {
-          console.log("🔴 Tidak ada hasil, mempertahankan input...");
-          response([{ label: request.term, value: request.term }]);
+        if (filteredData.length > 0) {
+          let listHtml = filteredData
+            .map(
+              (item) => `
+            <li class="list-group-item pasien-item" data-pasien='${JSON.stringify(
+              item
+            )}'>
+             Nama : ${item.Nama_pasien} | Tgl Lahir : ${formatTanggal(item.Tgl_lahir)} | Usia : ${item.Usia} | Jenis Kelamin : ${item.Jenis_kelamin}
+            </li>`
+            )
+            .join("");
+          $("#listPasien").html(listHtml);
+          $("#modalListPasien").modal("show");
         } else {
-          let namaList = filteredData.map((item) => ({
-            label: item.Nama_pasien,
-            value: item.Nama_pasien,
-            data: item,
-          }));
-          console.log("🟢 Data untuk autocomplete:", namaList);
-          response(namaList);
+          $("#listPasien").html(
+            '<li class="list-group-item text-muted">Tidak ada hasil</li>'
+          );
         }
       },
       complete: function () {
-        $("#loadingIcon").hide(); // Sembunyikan spinner setelah selesai
+        $("#loadingIcon").hide();
       },
       error: function () {
         console.log("🔴 Gagal mengambil data dari API");
         $("#loadingIcon").hide();
       },
     });
-  },
-  select: function (event, ui) {
-    console.log("Pasien Dipilih:", ui.item);
-    if (ui.item.data) {
-      let pasien = ui.item.data;
+  });
 
-      // Isi modal dengan data pasien
-      $("#modalNama").text(pasien.Nama_pasien || "-");
-      $("#modalTglLahir").text(formatTanggal(pasien.Tgl_lahir));
-      $("#modalUsia").text(pasien.Usia || "-");
-      $("#modalJK").text(
-        pasien.Jenis_kelamin === "L" ? "Laki-laki" : "Perempuan"
-      );
-      $("#modalAlamat").text(pasien.Alamat || "-");
-      $("#modalTB").text(pasien.Tinggi_badan || "-");
-      $("#modalBB").text(pasien.Berat_badan || "-");
-      // $("#modalIMT").text(pasien.Imt || "-");
-      // $("#modalHasilImt").text(pasien.Hasil_imt || "-");
-      // $("#modalLingkarP").text(pasien.Lingkar_perut || "-");
-      // $("#modalObesitas").text(pasien.Hasil_obesitas || "-");
-      // $("#modalSistol").text(pasien.Sistol || "-");
-      // $("#modalDiastol").text(pasien.Diastol || "-");
-      // $("#modalHT").text(pasien.Hasil_HT || "-");
-      // $("#modalCholesterol").text(pasien.Cholesterol || "-");
-      // $("#modalStroke").text(pasien.Hasil_Stroke || "-");
+  $(document).on("click", ".pasien-item", function () {
+    let pasien = JSON.parse($(this).attr("data-pasien"));
+    $("#Nama_pasien").val(pasien.Nama_pasien).trigger("change");
+    $("#Tgl_lahir").val(formatTanggal(pasien.Tgl_lahir) || "");
+    $("#Usia").val(pasien.Usia || "");
+    $("#Jenis_kelamin").val(pasien.Jenis_kelamin).trigger("change");
+    $("#Alamat").val(pasien.Alamat || "");
+    $("#RT").val(pasien.RT || "");
+    $("#Tinggi_badan").val(pasien.Tinggi_badan || "");
+    $("#Berat_badan").val(pasien.Berat_badan || "");
+    $("#Hasil_imt").val(pasien.Hasil_imt || "");
+    $("#IMT").val(pasien.IMT || "");
+    $("#Lingkarp").val(pasien.Lingkar_perut || "");
+    $("#obes").val(pasien.Hasil_obesitas || "");
+    $("#Sistol").val(pasien.Sistol || "");
+    $("#Diastol").val(pasien.Diastol || "");
+    $("#HasilHT").val(pasien.Hasil_HT || "");
+    $("#Cholesterol").val(pasien.Cholesterol || "");
+    $("#stroke").val(pasien.Hasil_Stroke || "");
+    $("#modalListPasien").modal("hide");
+  });
 
-      // Simpan data pasien sementara di modal
-      $("#modalPasien").data("selectedPasien", pasien);
-
-      // Tampilkan modal
-      setTimeout(function () {
-        $("#modalPasien").modal("show");
-      }, 300);
-    }
-
-    return false; // Hindari pengisian otomatis oleh autocomplete
-  },
+  $("#modalListPasien").on("hidden.bs.modal", function () {
+    $("#Nama_pasien").focus();
+  });
 });
 
-// Fungsi untuk mengubah format tanggal
 function formatTanggal(tanggal) {
   if (!tanggal) return "-";
   let dateObj = new Date(tanggal);
   let tahun = dateObj.getFullYear();
-  let bulan = String(dateObj.getMonth() + 1).padStart(2, "0"); // Bulan dimulai dari 0
+  let bulan = String(dateObj.getMonth() + 1).padStart(2, "0");
   let hari = String(dateObj.getDate()).padStart(2, "0");
   return `${tahun}-${bulan}-${hari}`;
 }
 
-// Event delegation untuk memastikan tombol bisa berfungsi
-$(document).on("click", "#btnPilihData", function () {
-  let pasien = $("#modalPasien").data("selectedPasien");
-
-  if (pasien) {
-    setTimeout(function () {
-      $("#Nama_pasien").val(pasien.Nama_pasien).trigger("change"); // Gunakan setTimeout & trigger
-      $("#Tgl_lahir").val(formatTanggal(pasien.Tgl_lahir) || "");
-      $("#Usia").val(pasien.Usia || "");
-      $("#Jenis_kelamin").val(pasien.Jenis_kelamin).trigger("change");
-      $("#Alamat").val(pasien.Alamat || "");
-      $("#RT").val(pasien.RT || "");
-      $("#Tinggi_badan").val(pasien.Tinggi_badan || "");
-      $("#Berat_badan").val(pasien.Berat_badan || "");
-      $("#Hasil_imt").val(pasien.Hasil_imt || "");
-      $("#IMT").val(pasien.IMT || "");
-      $("#Lingkarp").val(pasien.Lingkar_perut || "");
-      $("#obes").val(pasien.Hasil_obesitas || "");
-      $("#Sistol").val(pasien.Sistol || "");
-      $("#Diastol").val(pasien.Diastol || "");
-      $("#HasilHT").val(pasien.Hasil_HT || "");
-      $("#Cholesterol").val(pasien.Cholesterol || "");
-      $("#stroke").val(pasien.Hasil_Stroke || "");
-
-      console.log("✅ Nama pasien terisi:", $("#Nama_pasien").val()); // Debugging
-
-      // Pastikan input tetap fokus
-      $("#Nama_pasien").focus();
-    }, 300); // Tunggu 300ms agar tidak ditimpa autocomplete
-
-    // Tutup modal setelah memilih data
-    $("#modalPasien").modal("hide");
-  }
-});
-
-// Perbaiki Fokus Setelah Modal Ditutup
-$("#modalPasien").on("hidden.bs.modal", function () {
-  $("#Nama_pasien").focus();
-});
 
 // check duplikat
 $(document).ready(function () {
@@ -729,13 +764,236 @@ $(document).ready(function () {
 });
 
 
+// data untuk dashboard
 
+  document.addEventListener("DOMContentLoaded", async function () {
+    try {
+        const apiUrl = "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec";
+        const response = await fetch(apiUrl);
+        const data = await response.json();
 
+        if (data.length) {
+            const today = new Date().toISOString().split("T")[0];
+            let stats = { total: data.length, hariIni: 0, L: 0, P: 0 };
 
+            data.forEach(row => {
+                if (row.Tgl_pelayanan === today) stats.hariIni++;
+                let gender = row.Jenis_kelamin.trim().toUpperCase();
+                if (gender === "L") stats.L++;
+                else if (gender === "P") stats.P++;
+            });
 
+            // Fungsi untuk memperbarui teks & menghapus animasi loading
+            function updateElement(id, value) {
+                let element = document.getElementById(id);
+                if (element) {
+                    element.innerText = value;
+                    element.classList.remove("loading"); // Hapus animasi loading
+                }
+            }
 
+            updateElement("totalPasien", stats.total.toLocaleString());
+            updateElement("pasienHariIni", stats.hariIni);
+            updateElement("pasienLaki", stats.L);
+            updateElement("pasienPerempuan", stats.P);
+        }
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+});
 
+// fungsi Rekap data
 
+ document.addEventListener("DOMContentLoaded", function () {
+    const apiUrl = "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec";
+    let dataset = [];
 
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (Array.isArray(data)) {
+                dataset = data;
+                const tahunList = data.map(item => item.Tgl_pelayanan.split("-")[0]);
+                const bulanList = data.map(item => getMonthName(item.Tgl_pelayanan.split("-")[1]));
+                const petugasList = data.map(item => item.Nama_petugas);
 
+                populateSelect("tahun", tahunList);
+                populateSelect("bulan", bulanList);
+                populateSelect("petugas", petugasList);
+
+                // Aktifkan Select2
+                $(".select2").select2({
+                    theme: "bootstrap4",
+                    width: "100%",
+                    minimumResultsForSearch: 0
+                }).on("select2:select", updateTotalSkrining)
+                .on("select2:open", function () {
+                        setTimeout(() => {
+                            let searchField = document.querySelector(".select2-container--open .select2-search__field");
+                            if (searchField) searchField.focus();
+                        }, 100);
+                    });
+            }
+        })
+        .catch(error => console.error("Error fetching data:", error));
+
+    function populateSelect(selectId, values) {
+        const selectElement = $("#" + selectId);
+        if (!selectElement.length) return;
+
+        selectElement.html(`<option value="">---- Pilih Data ----</option>`);
+
+        [...new Set(values)].sort().forEach(value => {
+            selectElement.append(new Option(value, value));
+        });
+
+        // Tambahkan event listener agar Select2 bisa memicu update
+        selectElement.on("change", updateTotalSkrining);
+    }
+
+    function getMonthName(monthNumber) {
+        const monthNames = [
+            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        ];
+        return monthNames[parseInt(monthNumber, 10) - 1];
+    }
+
+    function getMonthNumber(monthName) {
+        const monthNames = {
+            "Januari": "01", "Februari": "02", "Maret": "03", "April": "04",
+            "Mei": "05", "Juni": "06", "Juli": "07", "Agustus": "08",
+            "September": "09", "Oktober": "10", "November": "11", "Desember": "12"
+        };
+        return monthNames[monthName];
+    }
+
+    function updateTotalSkrining() {
+        const selectedTahun = $("#tahun").val();
+        const selectedBulan = $("#bulan").val();
+        const selectedPetugas = $("#petugas").val();
+        const totalSkriningElement = $("#total-skrining");
+
+        console.log("Updating total-skrining...");
+
+        if (!totalSkriningElement.length) {
+            console.error("Element #total-skrining tidak ditemukan!");
+            return;
+        }
+
+        if (selectedTahun && selectedBulan && selectedPetugas) {
+            const bulanNumber = getMonthNumber(selectedBulan);
+
+            const filteredData = dataset.filter(item =>
+                item.Tgl_pelayanan.startsWith(`${selectedTahun}-${bulanNumber}`) &&
+                item.Nama_petugas.trim().toLowerCase() === selectedPetugas.trim().toLowerCase()
+            );
+
+            console.log("Filtered Data:", filteredData);
+
+            totalSkriningElement.text(filteredData.length);
+            totalSkriningElement.show(); // Pastikan elemen terlihat
+        } else {
+            totalSkriningElement.text("0");
+        }
+    }
+    function updateTotalSkrining() {
+    const selectedTahun = $("#tahun").val();
+    const selectedBulan = $("#bulan").val();
+    const selectedPetugas = $("#petugas").val();
+
+    const totalSkriningElement = $("#total-skrining");
+    const totalSkrining18_59Element = $("#total-skrining-18-59");
+    const totalSkrining60Element = $("#total-skrining-60");
+
+    console.log("Updating total-skrining...");
+
+    if (!totalSkriningElement.length || !totalSkrining18_59Element.length || !totalSkrining60Element.length) {
+        console.error("Elemen tidak ditemukan!");
+        return;
+    }
+
+    if (selectedTahun && selectedBulan && selectedPetugas) {
+        const bulanNumber = getMonthNumber(selectedBulan);
+
+        const filteredData = dataset.filter(item =>
+            item.Tgl_pelayanan.startsWith(`${selectedTahun}-${bulanNumber}`) &&
+            item.Nama_petugas.trim().toLowerCase() === selectedPetugas.trim().toLowerCase()
+        );
+
+        console.log("Filtered Data:", filteredData);
+
+        // Hitung total berdasarkan usia
+        const total18_59 = filteredData.filter(item => parseInt(item.Usia) <= 59).length;
+        const total60 = filteredData.filter(item => parseInt(item.Usia) >= 60).length;
+
+        // Update tampilan
+        totalSkriningElement.text(filteredData.length);
+        totalSkrining18_59Element.text(total18_59);
+        totalSkrining60Element.text(total60);
+
+        // Pastikan elemen terlihat
+        totalSkriningElement.show();
+        totalSkrining18_59Element.show();
+        totalSkrining60Element.show();
+    } else {
+        totalSkriningElement.text("0");
+        totalSkrining18_59Element.text("0");
+        totalSkrining60Element.text("0");
+    }
+}
+function updateSkriningObesitas() {
+    const selectedTahun = $("#tahun").val();
+    const selectedBulan = $("#bulan").val();
+    const selectedPetugas = $("#petugas").val();
+
+    console.log("🔄 Updating Skrining Obesitas...");
+    console.log("📆 Tahun:", selectedTahun, "| 📅 Bulan:", selectedBulan, "| 👤 Petugas:", selectedPetugas);
+
+    if (!selectedTahun || !selectedBulan || !selectedPetugas) {
+        console.warn("⚠️ Filter belum lengkap, tidak bisa menghitung skrining obesitas.");
+        return;
+    }
+
+    const bulanNumber = getMonthNumber(selectedBulan);
+    console.log("📅 Bulan dalam format angka:", bulanNumber);
+
+    // Filter data berdasarkan pilihan tahun, bulan, dan petugas
+    const filteredData = dataset.filter(item =>
+        item.Tgl_pelayanan.startsWith(`${selectedTahun}-${bulanNumber}`) &&
+        item.Nama_petugas.trim().toLowerCase() === selectedPetugas.trim().toLowerCase()
+    );
+
+    console.log("📝 Filtered Data for Obesitas:", filteredData);
+
+    // Hitung jumlah skrining obesitas berdasarkan usia
+    const totalObesitas59 = filteredData.filter(item =>
+        !isNaN(parseInt(item.USIA)) && parseInt(item.USIA) <= 59 && item.Hasil_obesitas
+    ).length;
+
+    const totalObesitas59Temu = filteredData.filter(item =>
+        !isNaN(parseInt(item.USIA)) && parseInt(item.USIA) <= 59 && item.Hasil_obesitas === "Obesitas"
+    ).length;
+
+    const totalObesitas60 = filteredData.filter(item =>
+        !isNaN(parseInt(item.USIA)) && parseInt(item.USIA) >= 60 && item.Hasil_obesitas
+    ).length;
+
+    const totalObesitas60Temu = filteredData.filter(item =>
+        !isNaN(parseInt(item.USIA)) && parseInt(item.USIA) >= 60 && item.Hasil_obesitas === "Obesitas"
+    ).length;
+
+    console.log("✅ Total Obesitas <= 59:", totalObesitas59);
+    console.log("✅ Total Obesitas <= 59 Temu:", totalObesitas59Temu);
+    console.log("✅ Total Obesitas >= 60:", totalObesitas60);
+    console.log("✅ Total Obesitas >= 60 Temu:", totalObesitas60Temu);
+
+    // Update tampilan
+    $("#Skriningobesitas-59").text(totalObesitas59 || "-");
+    $("#Skriningobesitas-59TEMU").text(totalObesitas59Temu || "-");
+    $("#Skriningobesitas-60").text(totalObesitas60 || "-");
+    $("#obes60temu").text(totalObesitas60Temu || "-");
+}
+
+});
 
