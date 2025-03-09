@@ -32,7 +32,7 @@
   <body>
     <button id="toggleSidebar"><i class="fas fa-bars"></i></button>
     <div class="sidebar" id="sidebar">
-      <h4 class="text-white">Dashboard</h4>
+      <h4 class="text-white">PKM | Trenggalek</h4> <hr class="text-white">
       <a href="#home" class="menu-link active" onclick="showPage('home', this)"><i class="fas fa-home"></i> Home</a>
 
       <a href="#" class="menu-link has-submenu" onclick="toggleSubmenu('analyticsMenu')">
@@ -52,6 +52,15 @@
         <a href="#reportdewasadanansia" class="menu-link" onclick="showPage('reportdewasadanansia', this)">Report Usia Dewasa dan Lansia</a>
         <a href="#reportusiaremaja" class="menu-link" onclick="showPage('reportusiaremaja', this)">Report Usia Remaja</a>
       </div>
+      <!-- page rekap -->
+      <a href="#" class="menu-link has-submenu" onclick="toggleSubmenu('Rekaplaporan')">
+        <i class="fas fa-file-alt"></i> Rekap Laporan
+        <i class="fas fa-chevron-down float-end"></i>
+      </a>
+      <div class="submenu" id="Rekaplaporan">
+        <a href="#rekapdewasalansia" class="menu-link" onclick="showPage('rekapdewasalansia', this)">Rekap Dewasa & Lansia</a>
+        <a href="#rekapremaja" class="menu-link" onclick="showPage('rekaremaja', this)">Rekap Remaja</a>
+      </div>
       <div class="sidebar-footer">
 	    <p class="text-white text-center">Made by @yoga | 2025</p>
 	  </div>
@@ -60,42 +69,61 @@
       <div id="home" class="page active"> 
         <div class="card shadow">
             <div class="card-body">
-              <h4>Welcome to the Dashboard</h4> 
-          <div class="container mt-5">
-              <div class="row">
-                      <h3>Dashboard</h3>
+              
+             <div class="container mt-5">
+                    <h3>Welcome to the Dashboard</h3> <hr> 
+                    <div class="row">
+                     <!--   -->
                       <div class="row g-3">
-                          <div class="col-md-3">
-                              <div class="card text-white bg-primary p-3">
-                                  <h5>Total Pasien</h5>
-                                  <h2>1,235</h2>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card text-white bg-success p-3">
-                                  <h5>Pasien Hari Ini</h5>
-                                  <h2>120</h2>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card text-white bg-warning p-3">
-                                  <h5>Kunjungan</h5>
-                                  <h2>98</h2>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card text-white bg-danger p-3">
-                                  <h5>Layanan</h5>
-                                  <h2>15</h2>
+
+                      <div class="col-md-3">
+                        <div class="card text-white bg-primary p-3 shadow">
+                          <h5>Total Pasien</h5>
+                          <h2 id="totalPasien" class="loading">Loading</h2>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="card text-white bg-success p-3 shadow">
+                          <h5>Pasien Hari Ini</h5>
+                          <h2 id="pasienHariIni" class="loading">Loading</h2>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="card text-white bg-warning p-3 shadow">
+                          <h5>Pasien Laki-Laki</h5>
+                          <h2 id="pasienLaki" class="loading">Loading</h2>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="card text-white bg-danger p-3 shadow">
+                          <h5>Pasien Perempuan</h5>
+                          <h2 id="pasienPerempuan" class="loading">Loading</h2>
+                        </div>
+                      </div>
+
+                  </div>
+
+                      <!-- Chart -->
+                      <div class="container mt-2">
+                          <div class="card shadow">
+                              <div class="card-body">
+                                  <div class="row">
+                                      <!-- Chart Usia -->
+                                      <div class="col-md-6">
+                                          <h5>Tren Kunjungan Berdasarkan Usia</h5>
+                                          <canvas id="chartKunjungan" style="max-width: 100%; height: 250px;"></canvas>
+                                      </div>
+                                      <!-- Chart Jenis Kelamin -->
+                                      <div class="col-md-6">
+                                          <h5>Tren Kunjungan Berdasarkan Jenis Kelamin</h5>
+                                          <canvas id="chartJeniskelamin" style="max-width: 100%; height: 250px;"></canvas>
+                                      </div>
+                                  </div>
                               </div>
                           </div>
                       </div>
 
-                      <!-- Chart -->
-                      <div class="card mt-4 p-3">
-                          <h5>Tren Kunjungan</h5>
-                          <canvas id="chartKunjungan"></canvas>
-                      </div>
+                     
 
                       
                       </div>
@@ -106,6 +134,247 @@
             </div>
         <!-- </div> -->
           
+      </div>
+      <div id="rekapdewasalansia" class="page"> 
+        <div class="card shadow">
+          <div class="card-body">
+            <h4>Rekap Dewasa Lansia</h4>
+             <div class="container my-4">
+     
+          <div class="header text-center mb-3">
+            <h2>REKAP SKRINING KLASTER 3</h2>
+            <p><strong>INDUK PUSKESMAS TRENGGALEK</strong></p>
+          </div>
+          <form id="print_form">
+           
+        </div>
+          <!-- Filter Section -->
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="tahun">Tahun:</label>
+              <select id="tahun" class="form-control select2">
+                <option value="">Pilih Tahun</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="bulan">Bulan:</label>
+              <select id="bulan" class="form-control select2">
+                <option value="">Semua Bulan</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="petugas">Petugas:</label>
+              <select id="petugas" class="form-control select2">
+                <option value="">Semua Petugas</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Cards Section -->
+          <div class="row text-center">
+            <div class="col-md-4">
+              <div class="card card-e mt-3 shadow">
+                <div class="card-body">
+                  <h5 class="card-title">Total Skrining</h5>
+                  <p class="highlight-number" id="total-skrining">0</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card card-e mt-3 shadow">
+                <div class="card-body">
+                  <h5 class="card-title">Total Skrining 18-59 TH</h5>
+                  <p class="highlight-number" id="total-skrining-18-59">0</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card card-e mt-3 shadow">
+                <div class="card-body">
+                  <h5 class="card-title">Total Skrining 60 TH</h5>
+                  <p class="highlight-number" id="total-skrining-60">0</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+           <table class="table table-bordered text-center mt-4 shadow">
+            <thead class="table-primary">
+                <tr>
+                    <th rowspan="2">NO</th>
+                    <th rowspan="2">INDIKATOR</th>
+                    <th colspan="2">18-59 TH</th>
+                    <th colspan="2">60 TH</th>
+                </tr>
+                <tr>
+                    <th>Total Skrining</th>
+                    <th>Ditemukan</th>
+                    <th>Total Skrining</th>
+                    <th>Ditemukan</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td class="text-start">SKRNING OBESITAS</td>
+                    <td id="Skriningobesitas-59">-</td>
+                    <td id="Skriningobesitas-59TEMU">-</td>
+                    <td id="Skriningobesitas-60">-</td>
+                    <td id="obes60temu">-</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td class="text-start">SKRINING HT</td>
+                    <td id="ht-59">-</td>
+                    <td id="ht-59temu">-</td>
+                    <td id="ht-60">-</td>
+                    <td id="ht-60temu">-</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td class="text-start">SKRINING STROKE</td>
+                    <td id="stroke-59">-</td>
+                    <td id="stroke-59temu">-</td>
+                    <td id="stroke-60">-</td>
+                    <td id="stroke-60temu">-</td>
+                </tr>
+                 <tr>
+                    <td>4</td>
+                    <td class="text-start">SKRINING JANTUNG</td>
+                    <td id="jantung-59">-</td>
+                    <td id="jantung-59temu">-</td>
+                    <td id="jantung-60">-</td>
+                    <td id="jantung-60temu">-</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td class="text-start">SKRINING CA SERVIX</td>
+                    <td id="cervix-59">-</td>
+                    <td id="cervix-59temu">-</td>
+                    <td id="cervix-60">-</td>
+                    <td id="cervix-60temu">-</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td class="text-start">SKRINING CA MAMAE</td>
+                    <td id="mamae-59">-</td>
+                    <td id="mamae-59temu">-</td>
+                    <td id="mamae-60">-</td>
+                    <td id="mamae-60temu">-</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td class="text-start">SKRINING CA KOLORECTAL</td>
+                    <td id="Kolorektal-59">-</td>
+                    <td id="Kolorektal-59temu">-</td>
+                    <td id="Kolorektal-60">-</td>
+                    <td id="Kolorektal-60temu">-</td>
+                </tr>
+                 <tr>
+                    <td>8</td>
+                    <td class="text-start">SKRINING CA PARU</td>
+                    <td id="paru-59">-</td>
+                    <td id="paru-59temu">-</td>
+                    <td id="paru-60">-</td>
+                    <td id="paru-60temu">-</td>
+                </tr>
+                 <tr>
+                    <td>9</td>
+                    <td class="text-start">SKRINING DM</td>
+                    <td id="diabetes-59">-</td>
+                    <td id="diabetes-59temu">-</td>
+                    <td id="diabetes-60">-</td>
+                    <td id="diabetes-60temu">-</td>
+                </tr>
+                 <tr>
+                    <td>10</td>
+                    <td class="text-start">SKRINING PPOK</td>
+                    <td id="ppok-59">-</td>
+                    <td id="ppok-59temu">-</td>
+                    <td id="ppok-60">-</td>
+                    <td id="ppok-60temu">-</td>
+                </tr>
+                 <tr>
+                    <td>11</td>
+                    <td class="text-start">SKRINING GINJAL</td>
+                    <td id="ginjal-59">-</td>
+                    <td id="ginjal-59temu">-</td>
+                    <td id="ginjal-60">-</td>
+                    <td id="ginjal-60temu">-</td>
+                </tr>
+                 <tr>
+                    <td>12</td>
+                    <td class="text-start">SKRINING TBC</td>
+                    <td id="tbc-59">-</td>
+                    <td id="tbc-59temu">-</td>
+                    <td id="tbc-60">-</td>
+                    <td id="tbc-60temu">-</td>
+                </tr>
+                 <tr>
+                    <td>13</td>
+                    <td class="text-start">SKRINING MALARIA</td>
+                    <td id="malaria-59">-</td>
+                    <td id="malaria-59temu">-</td>
+                    <td id="malaria-60">-</td>
+                    <td id="malaria-60temu">-</td>
+                </tr>
+                 <tr>
+                    <td>14</td>
+                    <td class="text-start"> SKRINING HEPATITIS</td>
+                    <td id="Hepatitis-59">-</td>
+                    <td id="Hepatitis-59temu">-</td>
+                    <td id="Hepatitis-60">-</td>
+                    <td id="Hepatitis-60temu">-</td>
+                </tr>
+                 <tr>
+                    <td>15</td>
+                    <td class="text-start"> SKRINING HIV</td>
+                    <td id="Hiv-59">-</td>
+                    <td id="Hiv-59temu">-</td>
+                    <td id="Hiv-60">-</td>
+                    <td id="Hiv-60temu">-</td>
+                </tr>
+                 <tr>
+                    <td>16</td>
+                    <td class="text-start"> SKRINING JIWA</td>
+                    <td id="Jiwa-59">-</td>
+                    <td id="Jiwa-59temu">-</td>
+                    <td id="Jiwa-60">-</td>
+                    <td id="Jiwa-60temu">-</td>
+                </tr>
+                 <tr>
+                    <td>17</td>
+                    <td class="text-start"> SKRINING INDERA</td>
+                    <td id="Indera-59">-</td>
+                    <td id="Indera-59temu">-</td>
+                    <td id="Indera-60">-</td>
+                    <td id="Indera-60temu">-</td>
+                </tr>
+                 <tr>
+                    <td>18</td>
+                    <td class="text-start"> SKRINING SKILAS, ADL</td>
+                    <td id="Adl-59">-</td>
+                    <td id="Adl-59temu">-</td>
+                    <td id="Adl-60">-</td>
+                    <td id="Adl-60temu">-</td>
+                </tr>
+                 <tr>
+                    <td>19</td>
+                    <td class="text-start"> SKRINING CATIN</td>
+                    <td id="Catin-59">-</td>
+                    <td id="Catin-59temu">-</td>
+                    <td id="Catin-60">-</td>
+                    <td id="Catin-60temu">-</td>
+                </tr>
+               
+                
+            </tbody>
+           </table>
+         </div>
+         </form>
+       </div>
+        </div>
       </div>
       <div id="reportdewasadanansia" class="page">
       <div class="container mt-5">
@@ -424,3 +693,20 @@
 </body>
 </html>
 
+<!-- MOdallist pasien -->
+<!-- Modal List Pasien -->
+<div class="modal fade" id="modalListPasien" tabindex="-1" aria-labelledby="modalListPasienLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalListPasienLabel">Pilih Nama Pasien</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ul id="listPasien" class="list-group"></ul>
+      </div>
+    </div>
+  </div>
+</div>
