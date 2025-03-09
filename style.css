@@ -266,3 +266,28 @@ input[readonly] {
 .modal.show .modal-content {
     animation: fadeIn 0.3s ease-in-out;
 }
+.pasien-item {
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.pasien-item:hover {
+  background-color: #007bff;
+  color: white;
+}
+ /* Animasi Loading */
+  .loading::after {
+    content: " .";
+    animation: dots 1.5s steps(3, end) infinite;
+  }
+
+  @keyframes dots {
+    0% { content: " ."; }
+    33% { content: " .."; }
+    66% { content: " ..."; }
+    100% { content: " ."; }
+  }
+  #chartKunjungan, #chartJeniskelamin {
+    max-width: 100%;
+    height: 250px !important;
+}
