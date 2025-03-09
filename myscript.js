@@ -600,7 +600,7 @@ $(document).ready(function () {
     $("#loadingIcon").show();
 
     $.ajax({
-      url: "https://script.google.com/macros/s/AKfycbwyy-oAsnZN_D6wfKOBOGDWXfhS-w51-BGi6sedh53y-z0kQoFRPgP6_OXfa6LFQ-mh/exec",
+      url: "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec",
       type: "GET",
       dataType: "json",
       success: function (data) {
@@ -643,6 +643,7 @@ $(document).ready(function () {
     $("#Nama_pasien").val(pasien.Nama_pasien).trigger("change");
     $("#Tgl_lahir").val(formatTanggal(pasien.Tgl_lahir) || "");
     $("#Usia").val(pasien.Usia || "");
+    $("#NIK").val(pasien.NIK || "");
     $("#Jenis_kelamin").val(pasien.Jenis_kelamin).trigger("change");
     $("#Alamat").val(pasien.Alamat || "");
     $("#RT").val(pasien.RT || "");
@@ -804,7 +805,7 @@ $(document).ready(function () {
 
 // fungsi Rekap data
 
- document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
     const apiUrl = "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec";
     let dataset = [];
 
@@ -872,12 +873,21 @@ $(document).ready(function () {
         const selectedTahun = $("#tahun").val();
         const selectedBulan = $("#bulan").val();
         const selectedPetugas = $("#petugas").val();
+
         const totalSkriningElement = $("#total-skrining");
+        const totalSkrining18_59Element = $("#total-skrining-18-59");
+        const totalSkrining60Element = $("#total-skrining-60");
+        const totalskriningObesitas59Element = $("#Skriningobesitas-59");
+        const totalskriningObesitas59TemuElement = $("#Skriningobesitas-59TEMU");
+        const totalskriningObesitas60Element = $("#Skriningobesitas-60");
+        const totalskriningObesitas60TemuElement = $("#obes60temu");
+        const totalskriningHT59Element = $("#ht-59");
+        const totalskriningHT59TemuElement = $("#ht-59temu");
 
         console.log("Updating total-skrining...");
 
-        if (!totalSkriningElement.length) {
-            console.error("Element #total-skrining tidak ditemukan!");
+        if (!totalSkriningElement.length || !totalSkrining18_59Element.length || !totalSkrining60Element.length) {
+            console.error("Elemen tidak ditemukan!");
             return;
         }
 
@@ -891,109 +901,48 @@ $(document).ready(function () {
 
             console.log("Filtered Data:", filteredData);
 
+            // Hitung total berdasarkan usia
+            const total18_59 = filteredData.filter(item =>  parseInt(item.Usia) <= 59).length;
+            const total60 = filteredData.filter(item => parseInt(item.Usia) >= 60).length;
+             // Hitung jumlah obesitas usia <= 59
+            const totalObesitas59 = filteredData.filter(item => parseInt(item.Usia) <= 59 && item.Hasil_obesitas).length;
+            const totalObesitas59Temu = filteredData.filter(item => parseInt(item.Usia) <= 59 && item.Hasil_obesitas && item.Hasil_obesitas.toLowerCase() === "obesitas").length;
+            const totalObesitas60 = filteredData.filter(item => parseInt(item.Usia) >= 60 && item.Hasil_obesitas).length;
+            const totalObesitas60Temu = filteredData.filter(item => parseInt(item.Usia) >= 60 && item.Hasil_obesitas && item.Hasil_obesitas.toLowerCase() === "obesitas").length;
+            const totalHt59 = filteredData.filter(item => parseInt(item.Usia) <= 59 && item.Hasil_HT).length;
+            const totalHt59Temu = filteredData.filter(item => parseInt(item.Usia) <= 59 && item.Hasil_HT && item.Hasil_HT.toLowerCase() === "Hipertensi").length;
+            // Update tampilan
             totalSkriningElement.text(filteredData.length);
-            totalSkriningElement.show(); // Pastikan elemen terlihat
+            totalSkrining18_59Element.text(total18_59);
+            totalSkrining60Element.text(total60);
+            totalskriningObesitas59Element.text(totalObesitas59);
+            totalskriningObesitas59TemuElement.text(totalObesitas59Temu);
+            totalskriningObesitas60Element.text(totalObesitas60);
+            totalskriningObesitas60TemuElement.text(totalObesitas60Temu);
+            totalskriningHT59Element.text(totalHt59);
+            totalskriningHT59TemuElement.text(totalHt59Temu);
+            // Pastikan elemen terlihat
+            totalSkriningElement.show();
+            totalSkrining18_59Element.show();
+            totalSkrining60Element.show();
+            totalskriningObesitas59Element.show();
+            totalskriningObesitas59TemuElement.show();
+             totalskriningObesitas60Element.show();
+            totalskriningObesitas60TemuElement.show();
+            totalskriningHT59Element.show();
+            totalskriningHT59TemuElement.show();
         } else {
             totalSkriningElement.text("0");
+            totalSkrining18_59Element.text("0");
+            totalSkrining60Element.text("0");
+            totalskriningObesitas59Element.text("0");
+            totalskriningObesitas59TemuElement.text("0");
+            totalskriningObesitas60Element.text("0");
+            totalskriningObesitas60TemuElement.text("0");
+            totalskriningHT59Element.text("0");
+            totalskriningHT59TemuElement.text("0");
         }
     }
-    function updateTotalSkrining() {
-    const selectedTahun = $("#tahun").val();
-    const selectedBulan = $("#bulan").val();
-    const selectedPetugas = $("#petugas").val();
-
-    const totalSkriningElement = $("#total-skrining");
-    const totalSkrining18_59Element = $("#total-skrining-18-59");
-    const totalSkrining60Element = $("#total-skrining-60");
-
-    console.log("Updating total-skrining...");
-
-    if (!totalSkriningElement.length || !totalSkrining18_59Element.length || !totalSkrining60Element.length) {
-        console.error("Elemen tidak ditemukan!");
-        return;
-    }
-
-    if (selectedTahun && selectedBulan && selectedPetugas) {
-        const bulanNumber = getMonthNumber(selectedBulan);
-
-        const filteredData = dataset.filter(item =>
-            item.Tgl_pelayanan.startsWith(`${selectedTahun}-${bulanNumber}`) &&
-            item.Nama_petugas.trim().toLowerCase() === selectedPetugas.trim().toLowerCase()
-        );
-
-        console.log("Filtered Data:", filteredData);
-
-        // Hitung total berdasarkan usia
-        const total18_59 = filteredData.filter(item => parseInt(item.Usia) <= 59).length;
-        const total60 = filteredData.filter(item => parseInt(item.Usia) >= 60).length;
-
-        // Update tampilan
-        totalSkriningElement.text(filteredData.length);
-        totalSkrining18_59Element.text(total18_59);
-        totalSkrining60Element.text(total60);
-
-        // Pastikan elemen terlihat
-        totalSkriningElement.show();
-        totalSkrining18_59Element.show();
-        totalSkrining60Element.show();
-    } else {
-        totalSkriningElement.text("0");
-        totalSkrining18_59Element.text("0");
-        totalSkrining60Element.text("0");
-    }
-}
-function updateSkriningObesitas() {
-    const selectedTahun = $("#tahun").val();
-    const selectedBulan = $("#bulan").val();
-    const selectedPetugas = $("#petugas").val();
-
-    console.log("🔄 Updating Skrining Obesitas...");
-    console.log("📆 Tahun:", selectedTahun, "| 📅 Bulan:", selectedBulan, "| 👤 Petugas:", selectedPetugas);
-
-    if (!selectedTahun || !selectedBulan || !selectedPetugas) {
-        console.warn("⚠️ Filter belum lengkap, tidak bisa menghitung skrining obesitas.");
-        return;
-    }
-
-    const bulanNumber = getMonthNumber(selectedBulan);
-    console.log("📅 Bulan dalam format angka:", bulanNumber);
-
-    // Filter data berdasarkan pilihan tahun, bulan, dan petugas
-    const filteredData = dataset.filter(item =>
-        item.Tgl_pelayanan.startsWith(`${selectedTahun}-${bulanNumber}`) &&
-        item.Nama_petugas.trim().toLowerCase() === selectedPetugas.trim().toLowerCase()
-    );
-
-    console.log("📝 Filtered Data for Obesitas:", filteredData);
-
-    // Hitung jumlah skrining obesitas berdasarkan usia
-    const totalObesitas59 = filteredData.filter(item =>
-        !isNaN(parseInt(item.USIA)) && parseInt(item.USIA) <= 59 && item.Hasil_obesitas
-    ).length;
-
-    const totalObesitas59Temu = filteredData.filter(item =>
-        !isNaN(parseInt(item.USIA)) && parseInt(item.USIA) <= 59 && item.Hasil_obesitas === "Obesitas"
-    ).length;
-
-    const totalObesitas60 = filteredData.filter(item =>
-        !isNaN(parseInt(item.USIA)) && parseInt(item.USIA) >= 60 && item.Hasil_obesitas
-    ).length;
-
-    const totalObesitas60Temu = filteredData.filter(item =>
-        !isNaN(parseInt(item.USIA)) && parseInt(item.USIA) >= 60 && item.Hasil_obesitas === "Obesitas"
-    ).length;
-
-    console.log("✅ Total Obesitas <= 59:", totalObesitas59);
-    console.log("✅ Total Obesitas <= 59 Temu:", totalObesitas59Temu);
-    console.log("✅ Total Obesitas >= 60:", totalObesitas60);
-    console.log("✅ Total Obesitas >= 60 Temu:", totalObesitas60Temu);
-
-    // Update tampilan
-    $("#Skriningobesitas-59").text(totalObesitas59 || "-");
-    $("#Skriningobesitas-59TEMU").text(totalObesitas59Temu || "-");
-    $("#Skriningobesitas-60").text(totalObesitas60 || "-");
-    $("#obes60temu").text(totalObesitas60Temu || "-");
-}
-
 });
+
 
