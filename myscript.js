@@ -1,21 +1,36 @@
 const sidebar = document.getElementById("sidebar");
 const toggleSidebarBtn = document.getElementById("toggleSidebar");
 
+// Toggle sidebar
 toggleSidebarBtn.addEventListener("click", function () {
   sidebar.classList.toggle("active");
   toggleSidebarBtn.classList.toggle("active");
 });
 
 function toggleSubmenu(id) {
-  document.getElementById(id).classList.toggle("show");
+  const submenu = document.getElementById(id);
+  const isOpen = submenu.classList.contains("show");
+
+  // Tutup semua submenu terlebih dahulu
+  document.querySelectorAll(".submenu").forEach((s) => {
+    s.classList.remove("show");
+  });
+
+  // Jika submenu sebelumnya tidak terbuka, maka buka
+  if (!isOpen) {
+    submenu.classList.add("show");
+  }
 }
 
 function showPage(pageId, element) {
+  // Tutup semua halaman sebelum menampilkan yang baru
   document.querySelectorAll(".page").forEach((page) => {
     page.classList.remove("active");
   });
+
   setTimeout(() => {
     document.getElementById(pageId).classList.add("active");
+
     if (pageId === "skriningDewasa") {
       // Inisialisasi Select2 jika ada
       $(".select2").select2({
@@ -26,8 +41,6 @@ function showPage(pageId, element) {
         allowClear: true,
       });
 
-      // isi disini untuk fungsi baru
-
       // Fokus ke input pencarian saat Select2 dibuka
       $(".select2").on("select2:open", function () {
         let searchField = document.querySelector(
@@ -37,27 +50,35 @@ function showPage(pageId, element) {
           searchField.focus();
         }
       });
-      //flatpicker
-      $(function () {
-        flatpickr(".datepicker", {
-          dateFormat: "Y-m-d",
-          allowInput: true,
-          theme: "dark",
-        });
+
+      // Flatpickr
+      flatpickr(".datepicker", {
+        dateFormat: "Y-m-d",
+        allowInput: true,
+        theme: "dark",
       });
 
       fetchPetugas();
     }
   }, 100);
 
+  // Hapus kelas aktif dari semua menu-link dan tambahkan ke yang diklik
   document.querySelectorAll(".menu-link").forEach((link) => {
     link.classList.remove("active");
   });
   element.classList.add("active");
 
+  // Tutup sidebar jika layar kecil
   if (window.innerWidth <= 768) {
     sidebar.classList.remove("active");
     toggleSidebarBtn.classList.remove("active");
+  }
+
+  // Tutup semua submenu kecuali jika submenu dari menu yang diklik
+  if (!element.closest(".submenu")) {
+    document.querySelectorAll(".submenu").forEach((submenu) => {
+      submenu.classList.remove("show");
+    });
   }
 }
 
@@ -113,18 +134,18 @@ document.getElementById("btnFetch").addEventListener("click", function (e) {
     return;
   }
 
-// Kirim data ke Google Sheets menggunakan Fetch API
-// Buat objek khusus untuk API kedua (hanya field tertentu)
-let formObjectAPI2 = {
-  Nama_pasien: formObject.Nama_pasien,
-  NIK:formObject.NIK,
-  Tgl_lahir: formObject.Tgl_lahir,
-  Usia: formObject.Usia,
-  Jenis_kelamin: formObject.Jenis_kelamin,
-  Alamat: formObject.Alamat,
-  RT: formObject.RT,
-};
- Promise.all([
+  // Kirim data ke Google Sheets menggunakan Fetch API
+  // Buat objek khusus untuk API kedua (hanya field tertentu)
+  let formObjectAPI2 = {
+    Nama_pasien: formObject.Nama_pasien,
+    NIK: formObject.NIK,
+    Tgl_lahir: formObject.Tgl_lahir,
+    Usia: formObject.Usia,
+    Jenis_kelamin: formObject.Jenis_kelamin,
+    Alamat: formObject.Alamat,
+    RT: formObject.RT,
+  };
+  Promise.all([
     fetch(
       "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec",
       {
@@ -362,90 +383,103 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Chart
 document.addEventListener("DOMContentLoaded", async function () {
-    try {
-        const apiUrl = "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec";
-        const response = await fetch(apiUrl);
-        const data = await response.json();
+  try {
+    const apiUrl =
+      "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec";
+    const response = await fetch(apiUrl);
+    const data = await response.json();
 
-        if (data.length) {
-            // ========== 📌 CHART USIA ==========
-            let usiaCounts = {};
-            data.forEach(row => {
-                if (row.Usia !== undefined && row.Usia !== null) {
-                    let usia = String(row.Usia).trim();
-                    if (!isNaN(usia) && usia !== "") {
-                        usiaCounts[usia] = (usiaCounts[usia] || 0) + 1;
-                    }
-                }
-            });
-
-            let usiaLabels = Object.keys(usiaCounts).map(Number).sort((a, b) => a - b);
-            let usiaData = usiaLabels.map(usia => usiaCounts[usia]);
-
-            if (window.chartUsia) window.chartUsia.destroy();
-            const ctxUsia = document.getElementById("chartKunjungan").getContext("2d");
-            window.chartUsia = new Chart(ctxUsia, {
-                type: "line",
-                data: {
-                    labels: usiaLabels,
-                    datasets: [{
-                        label: "Jumlah Pasien per Usia",
-                        data: usiaData,
-                        borderColor: "#007bff",
-                        borderWidth: 2,
-                        fill: false,
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false, // Fix ukuran
-                    scales: {
-                        x: { title: { display: true, text: "Usia" } },
-                        y: { title: { display: true, text: "Jumlah Pasien" }, beginAtZero: true }
-                    }
-                }
-            });
-
-            // ========== 📌 CHART JENIS KELAMIN ==========
-            let countLaki = 0, countPerempuan = 0;
-            data.forEach(row => {
-                if (row.Jenis_kelamin) {
-                    let gender = row.Jenis_kelamin.trim().toUpperCase();
-                    if (gender === "L") countLaki++;
-                    else if (gender === "P") countPerempuan++;
-                }
-            });
-
-            if (window.chartJenisKelamin) window.chartJenisKelamin.destroy();
-            const ctxGender = document.getElementById("chartJeniskelamin").getContext("2d");
-            window.chartJenisKelamin = new Chart(ctxGender, {
-                type: "bar",
-                data: {
-                    labels: ["Laki-laki", "Perempuan"],
-                    datasets: [{
-                        label: "Jumlah Pasien",
-                        data: [countLaki, countPerempuan],
-                        backgroundColor: ["#007bff", "#ff6384"],
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false, // Fix ukuran
-                    scales: {
-                        y: { beginAtZero: true }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
+    if (data.length) {
+      // ========== 📌 CHART USIA ==========
+      let usiaCounts = {};
+      data.forEach((row) => {
+        if (row.Usia !== undefined && row.Usia !== null) {
+          let usia = String(row.Usia).trim();
+          if (!isNaN(usia) && usia !== "") {
+            usiaCounts[usia] = (usiaCounts[usia] || 0) + 1;
+          }
         }
-    } catch (error) {
-        console.error("Error fetching data:", error);
+      });
+
+      let usiaLabels = Object.keys(usiaCounts)
+        .map(Number)
+        .sort((a, b) => a - b);
+      let usiaData = usiaLabels.map((usia) => usiaCounts[usia]);
+
+      if (window.chartUsia) window.chartUsia.destroy();
+      const ctxUsia = document
+        .getElementById("chartKunjungan")
+        .getContext("2d");
+      window.chartUsia = new Chart(ctxUsia, {
+        type: "line",
+        data: {
+          labels: usiaLabels,
+          datasets: [
+            {
+              label: "Jumlah Pasien per Usia",
+              data: usiaData,
+              borderColor: "#007bff",
+              borderWidth: 2,
+              fill: false,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false, // Fix ukuran
+          scales: {
+            x: { title: { display: true, text: "Usia" } },
+            y: {
+              title: { display: true, text: "Jumlah Pasien" },
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+
+      // ========== 📌 CHART JENIS KELAMIN ==========
+      let countLaki = 0,
+        countPerempuan = 0;
+      data.forEach((row) => {
+        if (row.Jenis_kelamin) {
+          let gender = row.Jenis_kelamin.trim().toUpperCase();
+          if (gender === "L") countLaki++;
+          else if (gender === "P") countPerempuan++;
+        }
+      });
+
+      if (window.chartJenisKelamin) window.chartJenisKelamin.destroy();
+      const ctxGender = document
+        .getElementById("chartJeniskelamin")
+        .getContext("2d");
+      window.chartJenisKelamin = new Chart(ctxGender, {
+        type: "bar",
+        data: {
+          labels: ["Laki-laki", "Perempuan"],
+          datasets: [
+            {
+              label: "Jumlah Pasien",
+              data: [countLaki, countPerempuan],
+              backgroundColor: ["#007bff", "#ff6384"],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false, // Fix ukuran
+          scales: {
+            y: { beginAtZero: true },
+          },
+          plugins: {
+            legend: { display: false },
+          },
+        },
+      });
     }
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
 });
-
-
 
 // tampil report
 $(document).ready(function () {
@@ -465,15 +499,15 @@ $(document).ready(function () {
 
         // const newData = data.map((row) => {
         //   let rowData = headers.slice(0, 8).map((key) => row[key]); // Data utama tanpa ID
-          const newData = data.map((row) => {
+        const newData = data.map((row) => {
           let rowData = headers.slice(0, 8).map((key) => {
-          if ((key === "Tgl_pelayanan" || key === "Tgl_lahir") && row[key]) {
-            let date = new Date(row[key]);
-            return date.toISOString().split("T")[0];
-             // Format yyyy-mm-dd
-        }
-        return row[key];
-    });
+            if ((key === "Tgl_pelayanan" || key === "Tgl_lahir") && row[key]) {
+              let date = new Date(row[key]);
+              return date.toISOString().split("T")[0];
+              // Format yyyy-mm-dd
+            }
+            return row[key] ?? "-";
+          });
           // Tambahkan tombol View dan Delete dengan ID tersembunyi
           rowData.push(`
             <button class="btn btn-primary btn-sm view-btn shadow" data-id="${row.ID}">View</button>
@@ -589,7 +623,91 @@ $(document).ready(function () {
 });
 
 // ambil nama pasiem autocomplete
+// $(document).ready(function () {
+//   $("#Nama_pasien").on("input", function () {
+//     let keyword = $(this).val().trim().toLowerCase();
+//     if (keyword.length < 3) {
+//       $("#listPasien").empty();
+//       return;
+//     }
+
+//     $("#loadingIcon").show();
+
+//     $.ajax({
+//       url: "https://script.google.com/macros/s/AKfycbwyy-oAsnZN_D6wfKOBOGDWXfhS-w51-BGi6sedh53y-z0kQoFRPgP6_OXfa6LFQ-mh/exec",
+//       // https://script.google.com/macros/s/AKfycbwyy-oAsnZN_D6wfKOBOGDWXfhS-w51-BGi6sedh53y-z0kQoFRPgP6_OXfa6LFQ-mh/exec/
+//       // https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec
+//       type: "GET",
+//       dataType: "json",
+//       success: function (data) {
+//         console.log("Data API diterima:", data);
+//         let filteredData = data.filter((item) =>
+//           item.Nama_pasien.toLowerCase().includes(keyword)
+//         );
+
+//         if (filteredData.length > 0) {
+//           let listHtml = filteredData
+//             .map(
+//               (item) => `
+//             <li class="list-group-item pasien-item" data-pasien='${JSON.stringify(
+//               item
+//             )}'>
+//              Nama : ${item.Nama_pasien} | Tgl Lahir : ${formatTanggal(
+//                 item.Tgl_lahir
+//               )} | Usia : ${item.Usia} | Jenis Kelamin : ${item.Jenis_kelamin}
+//             </li>`
+//             )
+//             .join("");
+//           $("#listPasien").html(listHtml);
+//           $("#modalListPasien").modal("show");
+//         } else {
+//           $("#listPasien").html(
+//             '<li class="list-group-item text-muted">Tidak ada hasil</li>'
+//           );
+//         }
+//       },
+//       complete: function () {
+//         $("#loadingIcon").hide();
+//       },
+//       error: function () {
+//         console.log("🔴 Gagal mengambil data dari API");
+//         $("#loadingIcon").hide();
+//       },
+//     });
+//   });
+
+//   $(document).on("click", ".pasien-item", function () {
+//     let pasien = JSON.parse($(this).attr("data-pasien"));
+//     $("#Nama_pasien").val(pasien.Nama_pasien).trigger("change");
+//     $("#Tgl_lahir").val(formatTanggal(pasien.Tgl_lahir) || "");
+//     $("#Usia").val(pasien.Usia || "");
+//     $("#NIK").val(pasien.NIK || "");
+//     $("#Jenis_kelamin").val(pasien.Jenis_kelamin).trigger("change");
+//     $("#Alamat").val(pasien.Alamat || "");
+//     $("#RT").val(pasien.RT || "");
+//     $("#Tinggi_badan").val(pasien.Tinggi_badan || "");
+//     $("#Berat_badan").val(pasien.Berat_badan || "");
+//     $("#Hasil_imt").val(pasien.Hasil_imt || "");
+//     $("#IMT").val(pasien.IMT || "");
+//     $("#Lingkarp").val(pasien.Lingkar_perut || "");
+//     $("#obes").val(pasien.Hasil_obesitas || "");
+//     $("#Sistol").val(pasien.Sistol || "");
+//     $("#Diastol").val(pasien.Diastol || "");
+//     $("#HasilHT").val(pasien.Hasil_HT || "");
+//     $("#Cholesterol").val(pasien.Cholesterol || "");
+//     $("#stroke").val(pasien.Hasil_Stroke || "");
+//     $("#modalListPasien").modal("hide");
+//   });
+
+//   $("#modalListPasien").on("hidden.bs.modal", function () {
+//     $("#Nama_pasien").focus();
+//   });
+// });
 $(document).ready(function () {
+  let dataCache = [];
+  let fuse;
+  let debounceTimer;
+
   $("#Nama_pasien").on("input", function () {
     let keyword = $(this).val().trim().toLowerCase();
     if (keyword.length < 3) {
@@ -597,36 +715,28 @@ $(document).ready(function () {
       return;
     }
 
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      if (dataCache.length > 0) {
+        searchAndShowResults(keyword);
+      } else {
+        fetchDataFromAPI(keyword);
+      }
+    }, 300); // Debounce untuk mengurangi panggilan API
+  });
+
+  function fetchDataFromAPI(keyword) {
     $("#loadingIcon").show();
 
     $.ajax({
-      url: "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec",
+      url: "https://script.google.com/macros/s/AKfycbwyy-oAsnZN_D6wfKOBOGDWXfhS-w51-BGi6sedh53y-z0kQoFRPgP6_OXfa6LFQ-mh/exec",
       type: "GET",
       dataType: "json",
       success: function (data) {
         console.log("Data API diterima:", data);
-        let filteredData = data.filter((item) =>
-          item.Nama_pasien.toLowerCase().includes(keyword)
-        );
-
-        if (filteredData.length > 0) {
-          let listHtml = filteredData
-            .map(
-              (item) => `
-            <li class="list-group-item pasien-item" data-pasien='${JSON.stringify(
-              item
-            )}'>
-             Nama : ${item.Nama_pasien} | Tgl Lahir : ${formatTanggal(item.Tgl_lahir)} | Usia : ${item.Usia} | Jenis Kelamin : ${item.Jenis_kelamin}
-            </li>`
-            )
-            .join("");
-          $("#listPasien").html(listHtml);
-          $("#modalListPasien").modal("show");
-        } else {
-          $("#listPasien").html(
-            '<li class="list-group-item text-muted">Tidak ada hasil</li>'
-          );
-        }
+        dataCache = data; // Simpan data untuk pencarian cepat
+        fuse = new Fuse(dataCache, { keys: ["Nama_pasien"], threshold: 0.3 });
+        searchAndShowResults(keyword);
       },
       complete: function () {
         $("#loadingIcon").hide();
@@ -636,7 +746,32 @@ $(document).ready(function () {
         $("#loadingIcon").hide();
       },
     });
-  });
+  }
+
+  function searchAndShowResults(keyword) {
+    let results = fuse.search(keyword).map((result) => result.item);
+
+    if (results.length > 0) {
+      let listHtml = results
+        .map(
+          (item) => `
+          <li class="list-group-item pasien-item" data-pasien='${JSON.stringify(
+            item
+          )}'>
+            Nama : ${item.Nama_pasien} | Tgl Lahir : ${formatTanggal(
+            item.Tgl_lahir
+          )} | Usia : ${item.Usia} | Jenis Kelamin : ${item.Jenis_kelamin}
+          </li>`
+        )
+        .join("");
+      $("#listPasien").html(listHtml);
+      $("#modalListPasien").modal("show");
+    } else {
+      $("#listPasien").html(
+        '<li class="list-group-item text-muted">Tidak ada hasil</li>'
+      );
+    }
+  }
 
   $(document).on("click", ".pasien-item", function () {
     let pasien = JSON.parse($(this).attr("data-pasien"));
@@ -664,6 +799,15 @@ $(document).ready(function () {
   $("#modalListPasien").on("hidden.bs.modal", function () {
     $("#Nama_pasien").focus();
   });
+
+  function formatTanggal(tgl) {
+    if (!tgl) return "-";
+    let date = new Date(tgl);
+    return isNaN(date) ? "-" : date.toISOString().split("T")[0];
+  }
+  $(document).on("click", ".close", function () {
+    $("#modalListPasien").modal("hide");
+  });
 });
 
 function formatTanggal(tanggal) {
@@ -675,65 +819,69 @@ function formatTanggal(tanggal) {
   return `${tahun}-${bulan}-${hari}`;
 }
 
-
 // check duplikat
 $(document).ready(function () {
-    $("#btnCheckDuplicate").on("click", function (event) {
-        event.preventDefault(); // Mencegah reload halaman
+  $("#btnCheckDuplicate").on("click", function (event) {
+    event.preventDefault(); // Mencegah reload halaman
 
-        let nama = $("#Nama_pasien").val().trim();
-        let nik = $("#NIK").val().trim();
+    let nama = $("#Nama_pasien").val().trim();
+    let nik = $("#NIK").val().trim();
 
-        if (nama === "" || nik === "") {
-            $("#notifContainer, #badgeMatch").fadeOut();
-            return;
+    if (nama === "" || nik === "") {
+      $("#notifContainer, #badgeMatch").fadeOut();
+      return;
+    }
+
+    console.log("Memeriksa duplikasi untuk:", nama, nik);
+
+    // Tambahkan animasi loading
+    $("#loadingIcon").show();
+
+    $.ajax({
+      url: "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec",
+      type: "GET",
+      dataType: "json",
+      success: function (response) {
+        $("#loadingIcon").hide();
+        console.log("Respons API:", response);
+
+        let matchingData = response.filter(
+          (item) =>
+            item.Nama_pasien.toLowerCase() === nama.toLowerCase() &&
+            item.NIK.toString() === nik.toString()
+        );
+
+        if (matchingData.length > 0) {
+          $("#badgeMatch, #notifContainer").fadeIn();
+          $("#badgeMatch")
+            .off("click")
+            .on("click", function () {
+              showModalWithTable(matchingData);
+            });
+        } else {
+          $("#badgeMatch, #notifContainer").fadeOut();
         }
-
-        console.log("Memeriksa duplikasi untuk:", nama, nik);
-
-        // Tambahkan animasi loading
-        $("#loadingIcon").show();
-
-        $.ajax({
-            url: "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec",
-            type: "GET",
-            dataType: "json",
-            success: function (response) {
-                $("#loadingIcon").hide();
-                console.log("Respons API:", response);
-
-                let matchingData = response.filter(item => 
-                    item.Nama_pasien.toLowerCase() === nama.toLowerCase() &&
-                    item.NIK.toString() === nik.toString()
-                );
-
-                if (matchingData.length > 0) {
-                    $("#badgeMatch, #notifContainer").fadeIn();
-                    $("#badgeMatch").off("click").on("click", function () {
-                        showModalWithTable(matchingData);
-                    });
-                } else {
-                    $("#badgeMatch, #notifContainer").fadeOut();
-                }
-            },
-            error: function (xhr, status, error) {
-                $("#loadingIcon").hide();
-                console.error("Terjadi kesalahan dalam pengecekan data:", error);
-                alert("Gagal mengambil data. Silakan coba lagi.");
-            }
-        });
+      },
+      error: function (xhr, status, error) {
+        $("#loadingIcon").hide();
+        console.error("Terjadi kesalahan dalam pengecekan data:", error);
+        alert("Gagal mengambil data. Silakan coba lagi.");
+      },
     });
+  });
 
-    function showModalWithTable(data) {
-        let tableBody = $("#tablePasien tbody");
-        tableBody.empty();
+  function showModalWithTable(data) {
+    let tableBody = $("#tablePasien tbody");
+    tableBody.empty();
 
-        data.forEach((item) => {
-            tableBody.append(`
+    data.forEach((item) => {
+      tableBody.append(`
                 <tr>
                     <td>${item.Tempat_pelayanan}</td>
                     <td>${item.Nama_petugas}</td>
-                    <td>${new Date(item.Tgl_pelayanan).toLocaleDateString()}</td>
+                    <td>${new Date(
+                      item.Tgl_pelayanan
+                    ).toLocaleDateString()}</td>
                     <td>${item.Nama_pasien}</td>
                     <td>${item.NIK}</td>
                     <td>${new Date(item.Tgl_lahir).toLocaleDateString()}</td>
@@ -749,200 +897,278 @@ $(document).ready(function () {
                     <td>${item.Hasil_obesitas}</td>
                 </tr>
             `);
-        });
+    });
 
-        if (!$.fn.DataTable.isDataTable("#tablePasien")) {
-            $("#tablePasien").DataTable({
-                responsive: true,
-                destroy: true
-            });
-        } else {
-            $("#tablePasien").DataTable().clear().rows.add(data).draw();
-        }
-
-        $("#modalDuplikat").modal("show");
+    if (!$.fn.DataTable.isDataTable("#tablePasien")) {
+      $("#tablePasien").DataTable({
+        responsive: true,
+        destroy: true,
+      });
+    } else {
+      $("#tablePasien").DataTable().clear().rows.add(data).draw();
     }
-});
 
+    $("#modalDuplikat").modal("show");
+  }
+});
 
 // data untuk dashboard
 
-  document.addEventListener("DOMContentLoaded", async function () {
-    try {
-        const apiUrl = "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec";
-        const response = await fetch(apiUrl);
-        const data = await response.json();
+document.addEventListener("DOMContentLoaded", async function () {
+  try {
+    const apiUrl =
+      "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec";
+    const response = await fetch(apiUrl);
+    const data = await response.json();
 
-        if (data.length) {
-            const today = new Date().toISOString().split("T")[0];
-            let stats = { total: data.length, hariIni: 0, L: 0, P: 0 };
+    if (data.length) {
+      const today = new Date().toISOString().split("T")[0];
+      let stats = { total: data.length, hariIni: 0, L: 0, P: 0 };
 
-            data.forEach(row => {
-                if (row.Tgl_pelayanan === today) stats.hariIni++;
-                let gender = row.Jenis_kelamin.trim().toUpperCase();
-                if (gender === "L") stats.L++;
-                else if (gender === "P") stats.P++;
-            });
+      data.forEach((row) => {
+        if (row.Tgl_pelayanan === today) stats.hariIni++;
+        let gender = row.Jenis_kelamin.trim().toUpperCase();
+        if (gender === "L") stats.L++;
+        else if (gender === "P") stats.P++;
+      });
 
-            // Fungsi untuk memperbarui teks & menghapus animasi loading
-            function updateElement(id, value) {
-                let element = document.getElementById(id);
-                if (element) {
-                    element.innerText = value;
-                    element.classList.remove("loading"); // Hapus animasi loading
-                }
-            }
-
-            updateElement("totalPasien", stats.total.toLocaleString());
-            updateElement("pasienHariIni", stats.hariIni);
-            updateElement("pasienLaki", stats.L);
-            updateElement("pasienPerempuan", stats.P);
+      // Fungsi untuk memperbarui teks & menghapus animasi loading
+      function updateElement(id, value) {
+        let element = document.getElementById(id);
+        if (element) {
+          element.innerText = value;
+          element.classList.remove("loading"); // Hapus animasi loading
         }
-    } catch (error) {
-        console.error("Error fetching data:", error);
+      }
+
+      updateElement("totalPasien", stats.total.toLocaleString());
+      updateElement("pasienHariIni", stats.hariIni);
+      updateElement("pasienLaki", stats.L);
+      updateElement("pasienPerempuan", stats.P);
     }
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
 });
 
 // fungsi Rekap data
-
 document.addEventListener("DOMContentLoaded", function () {
-    const apiUrl = "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec";
-    let dataset = [];
+  const apiUrl =
+    "https://script.google.com/macros/s/AKfycbwRBFanMaw9jXrQgWJGamdBh67-gwbujZpsL1M8dqsScI3ZObygm47cpS7Yc0MTTVl5/exec";
+  let dataset = [];
 
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (Array.isArray(data)) {
-                dataset = data;
-                const tahunList = data.map(item => item.Tgl_pelayanan.split("-")[0]);
-                const bulanList = data.map(item => getMonthName(item.Tgl_pelayanan.split("-")[1]));
-                const petugasList = data.map(item => item.Nama_petugas);
+  fetch(apiUrl)
+    .then((response) => response.json())
+    .then((data) => {
+      if (Array.isArray(data)) {
+        dataset = data;
 
-                populateSelect("tahun", tahunList);
-                populateSelect("bulan", bulanList);
-                populateSelect("petugas", petugasList);
-
-                // Aktifkan Select2
-                $(".select2").select2({
-                    theme: "bootstrap4",
-                    width: "100%",
-                    minimumResultsForSearch: 0
-                }).on("select2:select", updateTotalSkrining)
-                .on("select2:open", function () {
-                        setTimeout(() => {
-                            let searchField = document.querySelector(".select2-container--open .select2-search__field");
-                            if (searchField) searchField.focus();
-                        }, 100);
-                    });
-            }
-        })
-        .catch(error => console.error("Error fetching data:", error));
-
-    function populateSelect(selectId, values) {
-        const selectElement = $("#" + selectId);
-        if (!selectElement.length) return;
-
-        selectElement.html(`<option value="">---- Pilih Data ----</option>`);
-
-        [...new Set(values)].sort().forEach(value => {
-            selectElement.append(new Option(value, value));
-        });
-
-        // Tambahkan event listener agar Select2 bisa memicu update
-        selectElement.on("change", updateTotalSkrining);
-    }
-
-    function getMonthName(monthNumber) {
-        const monthNames = [
-            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        const tahunList = [
+          ...new Set(data.map((item) => item.Tgl_pelayanan.split("-")[0])),
         ];
-        return monthNames[parseInt(monthNumber, 10) - 1];
+        const bulanList = [
+          "Semua Bulan",
+          ...new Set(
+            data.map((item) => getMonthName(item.Tgl_pelayanan.split("-")[1]))
+          ),
+        ];
+        const petugasList = [
+          "Semua Petugas",
+          ...new Set(data.map((item) => item.Nama_petugas)),
+        ];
+
+        populateSelect("tahun", tahunList);
+        populateSelect("bulan", bulanList);
+        populateSelect("petugas", petugasList);
+
+        $(".select2")
+          .select2({
+            theme: "bootstrap4",
+            width: "100%",
+            minimumResultsForSearch: 0,
+          })
+          .on("select2:select", updateTotalSkrining)
+          .on("select2:open", function () {
+            setTimeout(() => {
+              let searchField = document.querySelector(
+                ".select2-container--open .select2-search__field"
+              );
+              if (searchField) searchField.focus();
+            }, 100);
+          });
+      }
+    })
+    .catch((error) => console.error("Error fetching data:", error));
+
+  function populateSelect(selectId, values, includeAllOption = false) {
+    const selectElement = $("#" + selectId);
+    if (!selectElement.length) return;
+
+    // Set opsi default saat pertama kali dimuat
+    let optionsHtml = `<option value="">---- Pilih Data ----</option>`;
+
+    // Tambahkan opsi "Semua" jika diperlukan (untuk bulan & petugas)
+    if (includeAllOption) {
+      optionsHtml += `<option value="all">Semua</option>`;
     }
 
-    function getMonthNumber(monthName) {
-        const monthNames = {
-            "Januari": "01", "Februari": "02", "Maret": "03", "April": "04",
-            "Mei": "05", "Juni": "06", "Juli": "07", "Agustus": "08",
-            "September": "09", "Oktober": "10", "November": "11", "Desember": "12"
-        };
-        return monthNames[monthName];
+    // Tambahkan opsi lainnya
+    const uniqueValues = [...new Set(values)].sort();
+    uniqueValues.forEach((value) => {
+      optionsHtml += `<option value="${value}">${value}</option>`;
+    });
+
+    selectElement.html(optionsHtml);
+    selectElement.on("change", updateTotalSkrining);
+  }
+  function getMonthName(monthNumber) {
+    const monthNames = [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember",
+    ];
+    return monthNames[parseInt(monthNumber, 10) - 1] || "";
+  }
+
+  function getMonthNumber(monthName) {
+    const monthNames = {
+      Januari: "01",
+      Februari: "02",
+      Maret: "03",
+      April: "04",
+      Mei: "05",
+      Juni: "06",
+      Juli: "07",
+      Agustus: "08",
+      September: "09",
+      Oktober: "10",
+      November: "11",
+      Desember: "12",
+    };
+    return monthNames[monthName] || "00";
+  }
+
+  function updateTotalSkrining() {
+    const selectedTahun = $("#tahun").val();
+    const selectedBulan = $("#bulan").val();
+    const selectedPetugas = $("#petugas").val();
+
+    const elements = {
+      totalSkrining: $("#total-skrining"),
+      totalSkrining18_59: $("#total-skrining-18-59"),
+      totalSkrining60: $("#total-skrining-60"),
+      skriningObesitas59: $("#Skriningobesitas-59"),
+      skriningObesitas59Temu: $("#Skriningobesitas-59TEMU"),
+      skriningObesitas60: $("#Skriningobesitas-60"),
+      skriningObesitas60Temu: $("#obes60temu"),
+      skriningHT59: $("#ht-59"),
+      skriningHT59Temu: $("#ht-59temu"),
+      skriningHT60: $("#ht-60"),
+      skriningHT60Temu: $("#ht-60temu"),
+    };
+
+    if (!selectedTahun) {
+      resetElements(elements);
+
+      return;
     }
 
-    function updateTotalSkrining() {
-        const selectedTahun = $("#tahun").val();
-        const selectedBulan = $("#bulan").val();
-        const selectedPetugas = $("#petugas").val();
+    let filteredData = dataset.filter((item) => {
+      if (!item.Tgl_pelayanan || !item.Usia) return false;
 
-        const totalSkriningElement = $("#total-skrining");
-        const totalSkrining18_59Element = $("#total-skrining-18-59");
-        const totalSkrining60Element = $("#total-skrining-60");
-        const totalskriningObesitas59Element = $("#Skriningobesitas-59");
-        const totalskriningObesitas59TemuElement = $("#Skriningobesitas-59TEMU");
-        const totalskriningObesitas60Element = $("#Skriningobesitas-60");
-        const totalskriningObesitas60TemuElement = $("#obes60temu");
-        const totalskriningHT59Element = $("#ht-59");
-        const totalskriningHT59TemuElement = $("#ht-59temu");
+      const itemTahun = item.Tgl_pelayanan.split("-")[0];
+      const itemBulan = item.Tgl_pelayanan.split("-")[1];
 
-        console.log("Updating total-skrining...");
+      let isValid = itemTahun === selectedTahun;
 
-        if (!totalSkriningElement.length || !totalSkrining18_59Element.length || !totalSkrining60Element.length) {
-            console.error("Elemen tidak ditemukan!");
-            return;
-        }
+      if (selectedBulan !== "Semua Bulan") {
+        isValid = isValid && itemBulan === getMonthNumber(selectedBulan);
+      }
 
-        if (selectedTahun && selectedBulan && selectedPetugas) {
-            const bulanNumber = getMonthNumber(selectedBulan);
+      if (selectedPetugas !== "Semua Petugas") {
+        isValid =
+          isValid &&
+          item.Nama_petugas?.trim().toLowerCase() ===
+            selectedPetugas.trim().toLowerCase();
+      }
 
-            const filteredData = dataset.filter(item =>
-                item.Tgl_pelayanan.startsWith(`${selectedTahun}-${bulanNumber}`) &&
-                item.Nama_petugas.trim().toLowerCase() === selectedPetugas.trim().toLowerCase()
-            );
+      return isValid;
+    });
 
-            console.log("Filtered Data:", filteredData);
+    console.log("Filtered Data:", filteredData);
 
-            // Hitung total berdasarkan usia
-            const total18_59 = filteredData.filter(item =>  parseInt(item.Usia) <= 59).length;
-            const total60 = filteredData.filter(item => parseInt(item.Usia) >= 60).length;
-             // Hitung jumlah obesitas usia <= 59
-            const totalObesitas59 = filteredData.filter(item => parseInt(item.Usia) <= 59 && item.Hasil_obesitas).length;
-            const totalObesitas59Temu = filteredData.filter(item => parseInt(item.Usia) <= 59 && item.Hasil_obesitas && item.Hasil_obesitas.toLowerCase() === "obesitas").length;
-            const totalObesitas60 = filteredData.filter(item => parseInt(item.Usia) >= 60 && item.Hasil_obesitas).length;
-            const totalObesitas60Temu = filteredData.filter(item => parseInt(item.Usia) >= 60 && item.Hasil_obesitas && item.Hasil_obesitas.toLowerCase() === "obesitas").length;
-            const totalHt59 = filteredData.filter(item => parseInt(item.Usia) <= 59 && item.Hasil_HT).length;
-            const totalHt59Temu = filteredData.filter(item => parseInt(item.Usia) <= 59 && item.Hasil_HT && item.Hasil_HT.toLowerCase() === "Hipertensi").length;
-            // Update tampilan
-            totalSkriningElement.text(filteredData.length);
-            totalSkrining18_59Element.text(total18_59);
-            totalSkrining60Element.text(total60);
-            totalskriningObesitas59Element.text(totalObesitas59);
-            totalskriningObesitas59TemuElement.text(totalObesitas59Temu);
-            totalskriningObesitas60Element.text(totalObesitas60);
-            totalskriningObesitas60TemuElement.text(totalObesitas60Temu);
-            totalskriningHT59Element.text(totalHt59);
-            totalskriningHT59TemuElement.text(totalHt59Temu);
-            // Pastikan elemen terlihat
-            totalSkriningElement.show();
-            totalSkrining18_59Element.show();
-            totalSkrining60Element.show();
-            totalskriningObesitas59Element.show();
-            totalskriningObesitas59TemuElement.show();
-             totalskriningObesitas60Element.show();
-            totalskriningObesitas60TemuElement.show();
-            totalskriningHT59Element.show();
-            totalskriningHT59TemuElement.show();
-        } else {
-            totalSkriningElement.text("0");
-            totalSkrining18_59Element.text("0");
-            totalSkrining60Element.text("0");
-            totalskriningObesitas59Element.text("0");
-            totalskriningObesitas59TemuElement.text("0");
-            totalskriningObesitas60Element.text("0");
-            totalskriningObesitas60TemuElement.text("0");
-            totalskriningHT59Element.text("0");
-            totalskriningHT59TemuElement.text("0");
-        }
-    }
+    const getTotal = (condition) => filteredData.filter(condition).length;
+
+    const total18_59 = getTotal(
+      (item) => Number(item.Usia) && Number(item.Usia) <= 59
+    );
+    const total60 = getTotal(
+      (item) => Number(item.Usia) && Number(item.Usia) >= 60
+    );
+    const totalObesitas59 = getTotal(
+      (item) => Number(item.Usia) <= 59 && item.Hasil_obesitas
+    );
+    const totalObesitas59Temu = getTotal(
+      (item) =>
+        Number(item.Usia) <= 59 &&
+        (item.Hasil_obesitas || "").toLowerCase() === "obesitas"
+    );
+    const totalObesitas60 = getTotal(
+      (item) => Number(item.Usia) >= 60 && item.Hasil_obesitas
+    );
+    const totalObesitas60Temu = getTotal(
+      (item) =>
+        Number(item.Usia) >= 60 &&
+        (item.Hasil_obesitas || "").toLowerCase() === "obesitas"
+    );
+    const totalHt59 = getTotal(
+      (item) => Number(item.Usia) <= 59 && item.Hasil_HT
+    );
+    const totalHt59Temu = getTotal(
+      (item) =>
+        Number(item.Usia) <= 59 &&
+        (item.Hasil_HT || "").toLowerCase() === "hipertensi"
+    );
+    const totalHt60 = getTotal(
+      (item) => Number(item.Usia) >= 60 && item.Hasil_HT
+    );
+    const totalHt60Temu = getTotal(
+      (item) =>
+        Number(item.Usia) >= 60 &&
+        (item.Hasil_HT || "").toLowerCase() === "hipertensi"
+    );
+
+    updateElements(elements, {
+      totalSkrining: filteredData.length,
+      totalSkrining18_59: total18_59,
+      totalSkrining60: total60,
+      skriningObesitas59: totalObesitas59,
+      skriningObesitas59Temu: totalObesitas59Temu,
+      skriningObesitas60: totalObesitas60,
+      skriningObesitas60Temu: totalObesitas60Temu,
+      skriningHT59: totalHt59,
+      skriningHT59Temu: totalHt59Temu,
+      skriningHT60: totalHt60,
+      skriningHT60Temu: totalHt60Temu,
+    });
+  }
+
+  function resetElements(elements) {
+    Object.values(elements).forEach((el) => el.text("0").hide());
+  }
+
+  function updateElements(elements, data) {
+    Object.keys(elements).forEach((key) => {
+      elements[key].text(data[key]).show();
+    });
+  }
 });
-
-
