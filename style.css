@@ -205,66 +205,83 @@ input[readonly] {
 }
 /* Animasi Loading di Input NIK */
 @keyframes loading {
-    0% { border-color: #ccc; }
-    50% { border-color: #007bff; box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); }
-    100% { border-color: #ccc; }
+  0% {
+    border-color: #ccc;
+  }
+  50% {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  100% {
+    border-color: #ccc;
+  }
 }
 
 .loading {
-    animation: loading 1s infinite;
+  animation: loading 1s infinite;
 }
 
 /* Badge lebih elegan */
 #loadingIcon {
-    position: absolute;
-    right: 80px; /* Geser sedikit agar tidak menimpa teks input */
-    top: 23%;
-    transform: translateY(-50%);
+  position: absolute;
+  right: 80px; /* Geser sedikit agar tidak menimpa teks input */
+  top: 23%;
+  transform: translateY(-50%);
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading {
-    background: url('https://i.gifer.com/ZZ5H.gif') no-repeat right center;
-    background-size: 20px;
+  background: url("https://i.gifer.com/ZZ5H.gif") no-repeat right center;
+  background-size: 20px;
 }
 
 #notifContainer {
-    display: none;
-    background-color: #ffcccc;
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 5px;
-    display: flex;
-    align-items: center;
+  display: none;
+  background-color: #ffcccc;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
 }
 
 .badge {
-    cursor: pointer;
-    margin-right: 10px;
+  cursor: pointer;
+  margin-right: 10px;
 }
 
 /* Modal lebih stylish */
 .modal-header {
-    background: #007bff;
-    color: white;
+  background: #007bff;
+  color: white;
 }
 
 .modal-content {
-    border-radius: 10px;
+  border-radius: 10px;
 }
 
 /* Animasi muncul */
 @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .modal.show .modal-content {
-    animation: fadeIn 0.3s ease-in-out;
+  animation: fadeIn 0.3s ease-in-out;
 }
 .pasien-item {
   cursor: pointer;
@@ -275,19 +292,28 @@ input[readonly] {
   background-color: #007bff;
   color: white;
 }
- /* Animasi Loading */
-  .loading::after {
-    content: " .";
-    animation: dots 1.5s steps(3, end) infinite;
-  }
+/* Animasi Loading */
+.loading::after {
+  content: " .";
+  animation: dots 1.5s steps(3, end) infinite;
+}
 
-  @keyframes dots {
-    0% { content: " ."; }
-    33% { content: " .."; }
-    66% { content: " ..."; }
-    100% { content: " ."; }
+@keyframes dots {
+  0% {
+    content: " .";
   }
-  #chartKunjungan, #chartJeniskelamin {
-    max-width: 100%;
-    height: 250px !important;
+  33% {
+    content: " ..";
+  }
+  66% {
+    content: " ...";
+  }
+  100% {
+    content: " .";
+  }
+}
+#chartKunjungan,
+#chartJeniskelamin {
+  max-width: 100%;
+  height: 250px !important;
 }
